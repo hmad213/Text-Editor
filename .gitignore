@@ -1,0 +1,36 @@
+# Build directories
+/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Qt Creator
+*.user
+*.user.*.swp
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+*.autosave
+
+# Executables and object files
+*.exe
+*.o
+*.obj
+*.dll
+*.lib
+*.a
+*.pdb
+
+# Qt UI and resource generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# Backup files
+*~
+*.bak
+*.swp
+
+# Logs
+*.log
