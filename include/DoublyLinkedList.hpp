@@ -50,6 +50,10 @@ class DoublyLinkedList{
 
         }
 
+        DoublyLinkedList<T> splitList(int index){
+            
+        }
+
         Node<T>* operator[](int index){
 
         }
@@ -59,6 +63,6 @@ class DoublyLinkedList{
         }
 
         int getSize(){
-            
+
         }
 };
