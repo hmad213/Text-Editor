@@ -17,9 +17,9 @@ class Stack{
             count=1;
         }
         else{
-            cptr->fpoint=new Node(a);
-            cptr->fpoint->bpoint=cptr;
-            cptr=cptr->fpoint;
+            cptr->next=new Node(a);
+            cptr->next->prev=cptr;
+            cptr=cptr->next;
         }
     }
     char pop(){
@@ -31,9 +31,9 @@ class Stack{
         }
         else{
             char temp=cptr->data;
-            cptr=cptr->bpoint;
-            delete cptr->fpoint;
-            cptr->fpoint=nullptr;
+            cptr=cptr->prev;
+            delete cptr->next;
+            cptr->next=nullptr;
             return temp;
         }
     }
