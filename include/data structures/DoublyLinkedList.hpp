@@ -75,4 +75,12 @@ class doublylinkedlist{
         tail=cptr;
         delete cptr->next;
     }
+~doublylinkedlist(){
+    cptr=tail;
+    while(cptr!=head){
+        cptr=cptr->prev;
+        delete cptr->next;
+    }
+    delete cptr;
+    }
 };
