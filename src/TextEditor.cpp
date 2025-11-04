@@ -37,6 +37,11 @@ void TextEditor::addNewLine(){
 
 }
 
-string TextEditor::getText(){
+void TextEditor::removeLine(){
 
+}
+
+string TextEditor::getText(){
+    string text = "";
+    Node<char>* newNode = text[0][0];
 }

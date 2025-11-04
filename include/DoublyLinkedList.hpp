@@ -16,7 +16,6 @@ class DoublyLinkedList{
     private:
         Node<T>* head;
         Node<T>* tail;
-        int size;
     public:
         DoublyLinkedList(){
             head = nullptr;
@@ -34,7 +33,6 @@ class DoublyLinkedList{
 
         void insertAtHead(T value){
             Node<T>* newNode = new Node<T>(value);
-            size++;
             if(head == nullptr){
                 head = newNode;
                 tail = newNode;
@@ -48,7 +46,6 @@ class DoublyLinkedList{
 
         void insertAtTail(T value){
             Node<T>* newNode = new Node<T>(value);
-            size++;
             if(tail == nullptr){
                 head = newNode;
                 tail = newNode;
@@ -62,28 +59,32 @@ class DoublyLinkedList{
 
         void insertAtIndex(int index, T value){
             if(index < 0) throw out_of_range("Negative index");
-            if(index > size) throw out_of_range("Index out of range");
-
+            
             if(index == 0){
                 insertAtHead(value);
                 return;
             }
-            if(index == size){
-                insertAtTail(value);
-                return;
-            }
 
             Node<T>* cur = head;
-            for(int i = 0; i < index - 1; i++){
+            int currentIndex = 0;
+            
+            while(cur != nullptr && currentIndex < index - 1){
                 cur = cur->next;
+                currentIndex++;
+            }
+            
+            if(cur == nullptr) throw out_of_range("Index out of range");
+            
+            if(cur == tail){
+                insertAtTail(value);
+                return;
             }
 
             Node<T>* newNode = new Node<T>(value);
             newNode->next = cur->next;
             newNode->prev = cur;
-            current->next->prev = newNode;
-            current->next = newNode;
-            size++;
+            cur->next->prev = newNode;
+            cur->next = newNode;
         }
 
         void removeFromHead(){
@@ -92,13 +93,12 @@ class DoublyLinkedList{
             Node<T>* temp = head;
             head = head->next;
             if(head == nullptr){
-                tail = nullptr
+                tail = nullptr;
             }
             else{
                 head->prev = nullptr;
             }
             delete temp;
-            size--;
         }
 
         void removeFromTail(){
@@ -113,32 +113,34 @@ class DoublyLinkedList{
                 head = nullptr;
             }
             delete temp;
-            size--;
         }
 
         void removeFromIndex(int index){
             if(index < 0) throw out_of_range("Negative index");
-            if(index >= size) throw out_of_range("Index out of range");
             
             if(index == 0){
                 removeFromHead();
                 return;
             }
             
-            if(index == size - 1){
-                removeFromTail();
-                return;
+            Node<T>* current = head;
+            int currentIndex = 0;
+            
+            while(current != nullptr && currentIndex < index){
+                current = current->next;
+                currentIndex++;
             }
             
-            Node<T>* current = head;
-            for(int i = 0; i < index; i++){
-                current = current->next;
+            if(current == nullptr) throw out_of_range("Index out of range");
+            
+            if(current == tail){
+                removeFromTail();
+                return;
             }
             
             current->prev->next = current->next;
             current->next->prev = current->prev;
             delete current;
-            size--;
         }
 
         DoublyLinkedList<T> splitList(int index){
@@ -147,23 +149,42 @@ class DoublyLinkedList{
 
         Node<T>* operator[](int index){
             if (index < 0) throw out_of_range("Negative index");
-            if(index > size) throw out_of_range("Index out of range");
 
-            Node* ptr = head;
-            int temp = 0;
-            while(temp != index){
-                temp++;
+            Node<T>* ptr = head;
+            int currentIndex = 0;
+            while(ptr != nullptr && currentIndex < index){
+                currentIndex++;
                 ptr = ptr->next;
             }
-
+            
+            if(ptr == nullptr) throw out_of_range("Index out of range");
             return ptr;
         }
 
         bool isEmpty(){
-            return size == 0;
+            return head == nullptr;
         }
 
         int getSize(){
-            return size;
+            int count = 0;
+            Node<T>* current = head;
+            while(current != nullptr){
+                count++;
+                current = current->next;
+            }
+            return count;
+        }
+
+        static void insertAtNode(Node<T>* node, T value){
+            if(node == nullptr) return;
+            
+            Node<T>* newNode = new Node<T>(value);
+            newNode->next = node->next;
+            newNode->prev = node;
+            node->next = newNode;
+            
+            if(newNode->next != nullptr){
+                newNode->next->prev = newNode;
+            }
         }
 };

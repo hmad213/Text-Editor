@@ -20,6 +20,7 @@ class TextEditor{
         void removeChar();
 
         void addNewLine();
+        void removeLine();
 
         string getText();
 };
