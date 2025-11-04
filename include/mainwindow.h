@@ -13,12 +13,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    public:
+        explicit MainWindow(QWidget *parent = nullptr);
+        ~MainWindow();
 
-private:
-    Ui::TextEditor *ui;
+    private:
+        Ui::TextEditor *ui;
 };
 
 #endif

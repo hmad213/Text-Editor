@@ -22,7 +22,7 @@ TextEditor::~TextEditor(){
 }
 
 void TextEditor::insertChar(char value){
-
+    DoublyLinkedList<char>::insertAtNode(currentNode, value);
 }
 
 void TextEditor::insertString(string value){
@@ -42,6 +42,15 @@ void TextEditor::removeLine(){
 }
 
 string TextEditor::getText(){
-    string text = "";
-    Node<char>* newNode = text[0][0];
+    string str = "";
+    Node<DoublyLinkedList<char>*>* line = text[0];
+    while(line != nullptr){
+        Node<char>* cur = (*line->value)[0];
+        while(cur != nullptr){
+            str += cur->value;
+            cur = cur->next;
+        }
+        line = line->next;
+        str += '\n';
+    }
 }
