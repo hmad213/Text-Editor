@@ -5,8 +5,21 @@ using namespace std;
 
 class TextEditor{
     private:
-        DoublyLinkedList<DoublyLinkedList<char>> text;
+        DoublyLinkedList<DoublyLinkedList<char>*> text;
         Node<char>* currentNode;
+        Node<DoublyLinkedList<char>*>* currentLineNode;
+        int nodeIndex;
+        int lineIndex;
     public:
-        
+        TextEditor();
+        ~TextEditor();
+
+        void insertChar(char value);
+        void insertString(string value);
+
+        void removeChar();
+
+        void addNewLine();
+
+        string getText();
 };
