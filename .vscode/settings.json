@@ -16,6 +16,7 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "compare": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "stdexcept": "cpp"
     }
 }
