@@ -10,6 +10,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/forms")
+
 # Find Qt6 modules
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
@@ -26,7 +28,10 @@ qt_add_executable(${PROJECT_NAME}
 )
 
 # Include header directories
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    include
+    ${CMAKE_CURRENT_BINARY_DIR}  # Add this for generated ui_* headers
+)
 
 # Link Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)

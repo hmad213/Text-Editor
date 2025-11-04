@@ -38,7 +38,7 @@ class DoublyLinkedList{
         }
 
         void insertAtHead(T value){
-
+            
         }
 
         void insertAtTail(T value){
@@ -65,7 +65,6 @@ class DoublyLinkedList{
             
         }
 
-        // This is the setpos function. Made for more efficiency
         Node<T>* operator[](int index){
             if (index < 0) throw out_of_range("Negative index");
             Node* ptr = head;

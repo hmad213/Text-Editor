@@ -1,10 +1,24 @@
-#pragma once
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 #include <QMainWindow>
+#include "ui_texteditor.h"
+#include <QMessageBox>
+#include <QAction>
 
-class MainWindow : public QMainWindow {
+namespace Ui {
+class TextEditor;
+}
+
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private:
+    Ui::TextEditor *ui;
 };
+
+#endif
