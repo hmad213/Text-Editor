@@ -175,16 +175,31 @@ class DoublyLinkedList{
             return count;
         }
 
-        static void insertAtNode(Node<T>* node, T value){
-            if(node == nullptr) return;
+        Node<T>* insertAtNode(Node<T>* node, T value){
+            if(node == tail || !node){ 
+                insertAtTail(value);
+                return tail;
+            }
             
             Node<T>* newNode = new Node<T>(value);
             newNode->next = node->next;
             newNode->prev = node;
+            node->next->prev = newNode;
             node->next = newNode;
-            
-            if(newNode->next != nullptr){
-                newNode->next->prev = newNode;
+            return newNode;
+        }
+
+        Node<T>* removeFromNode(Node<T>* node){
+            if(node == nullptr) return nullptr;
+            if(node == tail){
+                removeFromTail();
+                return tail;
             }
+
+            Node<T>* temp = node->prev;
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+            delete node;
+            return temp;
         }
 };

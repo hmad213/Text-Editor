@@ -1,9 +1,15 @@
+#pragma once
 #include <iostream>
 #include "TextEditor.h"
 #include "mainwindow.h"
+#include <QObject>
+#include <QKeyEvent>
 using namespace std;
 
-class TextEditorManager{
+class TextEditorManager : public QObject{
+
+    Q_OBJECT
+
     private:
         TextEditor* textEditor;
         MainWindow* mainWindow;
@@ -11,11 +17,13 @@ class TextEditorManager{
         TextEditorManager();
         ~TextEditorManager();
         
-        void insertChar(char c, int line, int pos);
-        
-        void deleteChar(int line, int pos);
+        void insertChar(char c);
+        void handleKeyPress(QKeyEvent *event);
+        void deleteChar();
         
         std::string getText();
         
         void run();
+        
+        bool eventFilter(QObject *obj, QEvent *event) override;
 };

@@ -22,5 +22,7 @@ class TextEditor{
         void addNewLine();
         void removeLine();
 
+        void moveCursor(int x, int y);
+
         string getText();
 };
