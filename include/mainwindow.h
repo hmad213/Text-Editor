@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QTimer>
 
 class TextDisplayWidget;
 
@@ -29,16 +30,22 @@ public:
     
     TextDisplayWidget* getTextDisplayWidget() const { return textDisplayWidget; }
 
+    // Cursor position methods
+    void setCursorPosition(int line, int column);
+    void getCursorPosition(int &line, int &column) const;
+
 signals:
     void keyPressed(QKeyEvent* event);
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;  // Make sure this is here
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::TextEditor *ui;
     TextDisplayWidget *textDisplayWidget;
     QString currentText;
+    int cursorLine;
+    int cursorColumn;
 };
 
 // Custom widget class declared in header
@@ -52,13 +59,27 @@ public:
     void setText(const QString &text);
     QString getText() const;
     
+    void setCursorPosition(int line, int column);
+    void getCursorPosition(int &line, int &column) const;
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
+private slots:
+    void blinkCursor();
+
 private:
     QString m_text;
+    int m_cursorLine;
+    int m_cursorColumn;
+    bool m_cursorVisible;
+    QTimer m_cursorTimer;
+    QFont m_font;
+    
+    QPoint getCursorCoordinates() const;
+    void updateCursorBlink();
 };
 
 #endif

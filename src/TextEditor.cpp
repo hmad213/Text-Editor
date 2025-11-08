@@ -23,6 +23,7 @@ TextEditor::~TextEditor(){
 
 void TextEditor::insertChar(char value){
     currentNode = currentLineNode->value->insertAtNode(currentNode, value);
+    nodeIndex++;
 }
 
 // TODO: loop through the string and use insertChar to insert all the characters.
@@ -33,6 +34,7 @@ void TextEditor::insertString(string value){
 
 void TextEditor::removeChar(){
     currentNode = currentLineNode->value->removeFromNode(currentNode);
+    nodeIndex--;
 }
 
 // TODO: add a new line. A line in this case is a new node of DoublyLinkedList<char>*. Make sure to dynamically allocate
@@ -73,4 +75,12 @@ string TextEditor::getText(){
     }
     cout << str << endl;
     return str;
+}
+
+int TextEditor::getLineIndex(){
+    return lineIndex;
+}
+
+int TextEditor::getNodeIndex(){
+    return nodeIndex;
 }

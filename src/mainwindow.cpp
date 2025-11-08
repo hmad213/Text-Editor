@@ -1,9 +1,21 @@
 #include "mainwindow.h"
+#include <QCoreApplication>
+#include <QFontMetrics>
 
+// TextDisplayWidget implementation
 TextDisplayWidget::TextDisplayWidget(QWidget *parent) 
     : QWidget(parent)
+    , m_cursorLine(0)
+    , m_cursorColumn(0)
+    , m_cursorVisible(true)
+    , m_font("Monospace", 10)
 {
     setFocusPolicy(Qt::StrongFocus);
+    setFont(m_font);
+    
+    // Setup cursor blink timer
+    connect(&m_cursorTimer, &QTimer::timeout, this, &TextDisplayWidget::blinkCursor);
+    m_cursorTimer.start(500); // Blink every 500ms
 }
 
 void TextDisplayWidget::setText(const QString &text)
@@ -17,18 +29,95 @@ QString TextDisplayWidget::getText() const
     return m_text;
 }
 
+void TextDisplayWidget::setCursorPosition(int line, int column)
+{
+    m_cursorLine = line;
+    m_cursorColumn = column;
+    m_cursorVisible = true;
+    m_cursorTimer.start(500); // Reset blink timer
+    update();
+}
+
+void TextDisplayWidget::getCursorPosition(int &line, int &column) const
+{
+    line = m_cursorLine;
+    column = m_cursorColumn;
+}
+
 void TextDisplayWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
+    // Set font
+    painter.setFont(m_font);
+    QFontMetrics fm(m_font);
+    
+    // Draw background
     painter.fillRect(rect(), Qt::white);
     
+    // Draw border
     painter.setPen(Qt::gray);
     painter.drawRect(rect().adjusted(0, 0, -1, -1));
-
+    
+    // Draw text
     painter.setPen(Qt::black);
-    painter.drawText(rect().adjusted(5, 5, -5, -5), Qt::TextWordWrap, m_text);
+    
+    // Split text into lines and draw with cursor
+    QStringList lines = m_text.split('\n');
+    int y = 5 + fm.ascent();
+    
+    for (int i = 0; i < lines.size(); ++i) {
+        QString line = lines[i];
+        
+        // Draw the line text
+        painter.drawText(5, y, line);
+        
+        // Draw cursor if this is the current line and cursor is visible
+        if (i == m_cursorLine && m_cursorVisible) {
+            // Calculate cursor x position based on text width
+            QString textBeforeCursor = line.left(m_cursorColumn);
+            int cursorX = 5 + fm.horizontalAdvance(textBeforeCursor);
+            
+            // Draw cursor as a vertical line
+            painter.setPen(QPen(Qt::black, 2));
+            painter.drawLine(cursorX, y - fm.ascent(), cursorX, y + fm.descent());
+            painter.setPen(Qt::black); // Reset pen for text
+        }
+        
+        y += fm.height();
+    }
+    
+    // Draw cursor at end if no text
+    if (lines.isEmpty() && m_cursorLine == 0 && m_cursorColumn == 0 && m_cursorVisible) {
+        painter.setPen(QPen(Qt::black, 2));
+        painter.drawLine(5, 5, 5, 5 + fm.height());
+    }
+}
+
+QPoint TextDisplayWidget::getCursorCoordinates() const
+{
+    QFontMetrics fm(m_font);
+    QStringList lines = m_text.split('\n');
+    
+    int x = 5;
+    int y = 5;
+    
+    if (m_cursorLine < lines.size()) {
+        QString line = lines[m_cursorLine];
+        QString textBeforeCursor = line.left(m_cursorColumn);
+        x += fm.horizontalAdvance(textBeforeCursor);
+    }
+    
+    y += m_cursorLine * fm.height() + fm.ascent();
+    
+    return QPoint(x, y);
+}
+
+void TextDisplayWidget::blinkCursor()
+{
+    m_cursorVisible = !m_cursorVisible;
+    update();
 }
 
 void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
@@ -46,6 +135,28 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
 
 void TextDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
+    // Basic click-to-position cursor (you can enhance this)
+    QFontMetrics fm(m_font);
+    QStringList lines = m_text.split('\n');
+    
+    int clickY = event->pos().y();
+    int line = qBound(0, (clickY - 5) / fm.height(), lines.size() - 1);
+    
+    int clickX = event->pos().x() - 5;
+    QString lineText = lines.value(line, "");
+    
+    int column = 0;
+    int currentWidth = 0;
+    for (int i = 0; i < lineText.length(); ++i) {
+        int charWidth = fm.horizontalAdvance(lineText[i]);
+        if (currentWidth + charWidth / 2 > clickX) {
+            break;
+        }
+        currentWidth += charWidth;
+        column++;
+    }
+    
+    setCursorPosition(line, column);
     setFocus();
     QWidget::mousePressEvent(event);
 }
@@ -56,6 +167,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::TextEditor)
     , textDisplayWidget(nullptr)
     , currentText("")
+    , cursorLine(0)
+    , cursorColumn(0)
 {
     ui->setupUi(this);
     
@@ -94,9 +207,23 @@ QString MainWindow::getText() const
     return currentText;
 }
 
+void MainWindow::setCursorPosition(int line, int column)
+{
+    cursorLine = line;
+    cursorColumn = column;
+    if (textDisplayWidget) {
+        textDisplayWidget->setCursorPosition(line, column);
+    }
+}
+
+void MainWindow::getCursorPosition(int &line, int &column) const
+{
+    line = cursorLine;
+    column = cursorColumn;
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     emit keyPressed(event);
-    
     QMainWindow::keyPressEvent(event);
 }

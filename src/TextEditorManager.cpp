@@ -20,6 +20,7 @@ TextEditorManager::~TextEditorManager() {
 void TextEditorManager::insertChar(char c) {
     textEditor->insertChar(c);
     mainWindow->setText(textEditor->getText());
+    mainWindow->setCursorPosition(textEditor->getLineIndex(), textEditor->getNodeIndex());
 }
 
 void TextEditorManager::deleteChar() {
