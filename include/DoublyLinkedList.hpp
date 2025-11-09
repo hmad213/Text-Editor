@@ -157,7 +157,7 @@ class DoublyLinkedList{
                 ptr = ptr->next;
             }
             
-            if(ptr == nullptr) throw out_of_range("Index out of range");
+            if(ptr == nullptr) return tail;
             return ptr;
         }
 
@@ -173,6 +173,14 @@ class DoublyLinkedList{
                 current = current->next;
             }
             return count;
+        }
+
+        Node<T>* getHead(){
+            return head;
+        }
+
+        Node<T>* getTail(){
+            return tail;
         }
 
         Node<T>* insertAtNode(Node<T>* node, T value){
@@ -194,6 +202,11 @@ class DoublyLinkedList{
             if(node == tail){
                 removeFromTail();
                 return tail;
+            }
+
+            if(node == head){
+                removeFromHead();
+                return nullptr;
             }
 
             Node<T>* temp = node->prev;

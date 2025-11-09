@@ -24,6 +24,8 @@ class TextEditor{
 
         void moveCursor(int x, int y);
 
+        void setCursorPosition(int lineIndex, int nodeIndex);
+
         string getText();
         int getLineIndex();
         int getNodeIndex();

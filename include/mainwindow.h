@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 
+class TextEditorManager;
 class TextDisplayWidget;
 
 namespace Ui {
@@ -22,7 +23,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(TextEditorManager* manager = nullptr, QWidget *parent = nullptr);
     ~MainWindow();
 
     void setText(const std::string &text);
@@ -43,6 +44,7 @@ protected:
 private:
     Ui::TextEditor *ui;
     TextDisplayWidget *textDisplayWidget;
+    TextEditorManager* editorManager;
     QString currentText;
     int cursorLine;
     int cursorColumn;
@@ -54,7 +56,7 @@ class TextDisplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TextDisplayWidget(QWidget *parent = nullptr);
+    explicit TextDisplayWidget(TextEditorManager* manager = nullptr, QWidget *parent = nullptr);
     
     void setText(const QString &text);
     QString getText() const;
@@ -71,6 +73,7 @@ private slots:
     void blinkCursor();
 
 private:
+    TextEditorManager* editorManager;
     QString m_text;
     int m_cursorLine;
     int m_cursorColumn;
@@ -79,7 +82,6 @@ private:
     QFont m_font;
     
     QPoint getCursorCoordinates() const;
-    void updateCursorBlink();
 };
 
 #endif

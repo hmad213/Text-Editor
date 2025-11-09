@@ -1,2 +1,2 @@
-#include "TextEditorManger.h"
+#include "TextEditorManager.h"
 #include <QApplication>

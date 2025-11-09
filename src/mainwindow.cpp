@@ -1,17 +1,20 @@
 #include "mainwindow.h"
+#include "TextEditorManager.h"
 #include <QCoreApplication>
 #include <QFontMetrics>
 
 // TextDisplayWidget implementation
-TextDisplayWidget::TextDisplayWidget(QWidget *parent) 
+TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent) 
     : QWidget(parent)
+    , editorManager(manager)
     , m_cursorLine(0)
     , m_cursorColumn(0)
     , m_cursorVisible(true)
-    , m_font("Monospace", 10)
+    , m_font("Monospace", 14)
 {
     setFocusPolicy(Qt::StrongFocus);
     setFont(m_font);
+    setCursor(Qt::IBeamCursor);
     
     // Setup cursor blink timer
     connect(&m_cursorTimer, &QTimer::timeout, this, &TextDisplayWidget::blinkCursor);
@@ -122,20 +125,56 @@ void TextDisplayWidget::blinkCursor()
 
 void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
 {
-    QKeyEvent* newEvent = new QKeyEvent(
-        QEvent::KeyPress,
-        event->key(),
-        event->modifiers(),
-        event->text(),
-        event->isAutoRepeat(),
-        event->count()
-    );
-    QCoreApplication::postEvent(parent(), newEvent);
+    if (!editorManager) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    // Handle key events directly with the manager
+    if (event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    switch (event->key()) {
+        case Qt::Key_Backspace:
+            editorManager->deleteChar();
+            break;
+        case Qt::Key_Left:
+            editorManager->moveCursor(-1, 0);
+            break;
+        case Qt::Key_Up:
+            editorManager->moveCursor(0, -1);
+            break;
+        case Qt::Key_Down:
+            editorManager->moveCursor(0, 1);
+            break;
+        case Qt::Key_Right:
+            editorManager->moveCursor(1, 0);
+            break;
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            editorManager->insertChar('\n');
+            break;
+        case Qt::Key_Tab:
+            editorManager->insertChar('\t');
+            break;
+        default:
+            if (!event->text().isEmpty() && event->text().at(0).isPrint()) {
+                editorManager->insertChar(event->text().at(0).toLatin1());
+            }
+            break;
+    }
 }
 
 void TextDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
-    // Basic click-to-position cursor (you can enhance this)
+    if (!editorManager) {
+        QWidget::mousePressEvent(event);
+        return;
+    }
+
+    // Calculate cursor position from mouse click
     QFontMetrics fm(m_font);
     QStringList lines = m_text.split('\n');
     
@@ -156,23 +195,25 @@ void TextDisplayWidget::mousePressEvent(QMouseEvent *event)
         column++;
     }
     
-    setCursorPosition(line, column);
+    // Update cursor position through the text editor
+    editorManager->setCursorPosition(line, column);
     setFocus();
     QWidget::mousePressEvent(event);
 }
 
 // MainWindow implementation
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(TextEditorManager* manager, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TextEditor)
     , textDisplayWidget(nullptr)
+    , editorManager(manager)
     , currentText("")
     , cursorLine(0)
     , cursorColumn(0)
 {
     ui->setupUi(this);
     
-    textDisplayWidget = new TextDisplayWidget();
+    textDisplayWidget = new TextDisplayWidget(editorManager);
     ui->verticalLayout->replaceWidget(ui->textArea, textDisplayWidget);
     delete ui->textArea;
     ui->textArea = textDisplayWidget;
