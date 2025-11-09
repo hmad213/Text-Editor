@@ -1,7 +1,4 @@
 #include "mainwindow.h"
-#include "TextEditorManager.h"
-#include <QCoreApplication>
-#include <QFontMetrics>
 
 // TextDisplayWidget implementation
 TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent) 
@@ -226,6 +223,8 @@ MainWindow::MainWindow(TextEditorManager* manager, QWidget *parent)
 
     textDisplayWidget->setFocus();
     
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onOpenFile);
+    connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::onSaveFile);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     connect(ui->actionAbout, &QAction::triggered, this, [this]() {
         QMessageBox::about(this, tr("About Application"),
@@ -273,4 +272,38 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     emit keyPressed(event);
     QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::onSaveFile(){
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        "Save Text File",
+        QDir::homePath(),
+        "Text Files (*.txt);;All Files (*)"
+    );
+    
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(".txt", Qt::CaseInsensitive)) {
+            filePath += ".txt";
+        }
+        
+        if (editorManager) {
+            editorManager->saveToFile(filePath.toStdString());
+        }
+    }
+}
+
+void MainWindow::onOpenFile(){
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        "Open Text File",
+        QDir::homePath(),
+        "Text Files (*.txt);;All Files (*)"
+    );
+    
+    if (!filePath.isEmpty()) {
+        if (editorManager) {
+            editorManager->loadFromFile(filePath.toStdString());
+        }
+    }
 }

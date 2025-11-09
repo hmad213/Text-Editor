@@ -50,3 +50,11 @@ void TextEditorManager::updateDisplay() {
     mainWindow->setText(textEditor->getText());
     mainWindow->setCursorPosition(textEditor->getLineIndex(), textEditor->getNodeIndex());
 }
+
+void TextEditorManager::saveToFile(const string& filePath){
+
+}
+
+void TextEditorManager::loadFromFile(const string& filePath){
+
+}

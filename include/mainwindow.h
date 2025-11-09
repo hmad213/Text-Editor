@@ -10,6 +10,11 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QTimer>
+#include "TextEditorManager.h"
+#include <QCoreApplication>
+#include <QFontMetrics>
+#include <QDir>
+#include <QFileDialog>
 
 class TextEditorManager;
 class TextDisplayWidget;
@@ -40,6 +45,10 @@ signals:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+
+private slots:
+    void onSaveFile();
+    void onOpenFile();
 
 private:
     Ui::TextEditor *ui;

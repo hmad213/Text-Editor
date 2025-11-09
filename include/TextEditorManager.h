@@ -4,6 +4,7 @@
 #include "TextEditor.h"
 #include "mainwindow.h"
 #include <QObject>
+class MainWindow;
 
 class TextEditorManager : public QObject {
     Q_OBJECT
@@ -25,6 +26,8 @@ public:
     std::string getText();
     void run();
 
+    void saveToFile(const string& filePath);
+    void loadFromFile(const string& filePath);
 private:
     void updateDisplay();
 };
