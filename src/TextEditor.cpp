@@ -34,25 +34,60 @@ void TextEditor::insertString(string value){
 }
 
 void TextEditor::removeChar(){
-    if(!currentNode) return;
+    if(!currentNode){
+        removeLine();
+        return;
+    }
     currentNode = currentLineNode->value->removeFromNode(currentNode);
-    if(!currentNode) nodeIndex--;
     nodeIndex--;
     cout << lineIndex << ", " << nodeIndex << endl;
+}
+
+void TextEditor::removeCharFront(){
+    if(!currentNode){
+        if(!currentLineNode->value->getHead()) return;
+        currentLineNode->value->removeFromHead();
+        return;                    
+    }
+    if(!currentNode->next) return;
+    currentNode = currentLineNode->value->removeFromNode(currentNode->next);
 }
 
 // TODO: add a new line. A line in this case is a new node of DoublyLinkedList<char>*. Make sure to dynamically allocate
 // Special Case: Pressing enter in the middle of the line. use the function in DoublyLinkedList.hpp splitList
 // Note: The splitList function is not completed.
 void TextEditor::addNewLine(){
-
+    if(nodeIndex <= 0){
+        DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
+        text.insertAtIndex(lineIndex, newList);
+        lineIndex++;
+    }else{
+        DoublyLinkedList<char>* newList = currentLineNode->value->splitList(nodeIndex - 1);
+        text.insertAtNode(currentLineNode, newList);
+        currentLineNode = currentLineNode->next;
+        lineIndex++;
+        nodeIndex = 0;
+        currentNode = nullptr;
+    }
 }
 
 // TODO: remove a line. A line in this case is a new node of DoublyLinkedList<char>*.
 // Special Case: Pressing backspace at the start of the line in which case it will merge this linked list with the previous one
 // Note: The function has to be implemented in DoublyLinkedList.hpp
 void TextEditor::removeLine(){
+    if(lineIndex <= 0) return;
 
+    Node<DoublyLinkedList<char>*>* prevLine = currentLineNode->prev;
+
+    currentNode = prevLine->value->getTail();
+    nodeIndex = prevLine->value->getSize();
+
+    prevLine->value->mergeList(currentLineNode->value);
+
+    text.removeFromNode(currentLineNode);
+
+    lineIndex--;
+    currentLineNode = prevLine;
 }
 
 // TODO: adjusts the line depending on user input.
@@ -161,10 +196,12 @@ void TextEditor::setCursorPosition(int lineIndex, int nodeIndex){
     this->lineIndex = lineIndex;
     
     DoublyLinkedList<char>* currentLine = currentLineNode->value;
-    if (nodeIndex < 0) nodeIndex = 0;
     if (nodeIndex > currentLine->getSize()) nodeIndex = currentLine->getSize();
     
-    currentNode = (*currentLineNode->value)[nodeIndex];
+    if (nodeIndex <= 0) 
+        currentNode = nullptr;
+    else
+        currentNode = (*currentLineNode->value)[nodeIndex - 1];
     this->nodeIndex = nodeIndex;
     
     cout << this->lineIndex << ", " << this->nodeIndex << endl;

@@ -10,9 +10,10 @@ TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent
     , m_cursorLine(0)
     , m_cursorColumn(0)
     , m_cursorVisible(true)
-    , m_font("Monospace", 14)
+    , m_font("Consolas", 14)
 {
     setFocusPolicy(Qt::StrongFocus);
+    m_font.setStyleHint(QFont::TypeWriter);
     setFont(m_font);
     setCursor(Qt::IBeamCursor);
     
@@ -153,11 +154,16 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
             editorManager->moveCursor(1, 0);
             break;
         case Qt::Key_Return:
+            editorManager->insertChar('\n');
+            break;
         case Qt::Key_Enter:
             editorManager->insertChar('\n');
             break;
         case Qt::Key_Tab:
             editorManager->insertChar('\t');
+            break;
+        case Qt::Key_Delete:
+            editorManager->deleteCharFront();
             break;
         default:
             if (!event->text().isEmpty() && event->text().at(0).isPrint()) {

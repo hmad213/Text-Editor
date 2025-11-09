@@ -19,6 +19,7 @@ public:
     // Core functionality methods
     void insertChar(char c);
     void deleteChar();
+    void deleteCharFront();
     void moveCursor(int x, int y);
     void setCursorPosition(int line, int column);
     std::string getText();

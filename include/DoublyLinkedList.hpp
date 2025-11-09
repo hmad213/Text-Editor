@@ -143,8 +143,38 @@ class DoublyLinkedList{
             delete current;
         }
 
-        DoublyLinkedList<T> splitList(int index){
+        DoublyLinkedList<T>* splitList(int index){
+            if (index < 0 || index >= getSize() - 1) return new DoublyLinkedList<T>;
             
+            Node<T>* splitNode = (*this)[index];
+            DoublyLinkedList<T>* newList = new DoublyLinkedList<T>;
+            
+            if (splitNode->next != nullptr) {
+                newList->head = splitNode->next;
+                newList->tail = this->tail;
+                newList->head->prev = nullptr;
+                
+                this->tail = splitNode;
+                this->tail->next = nullptr;
+            }
+            
+            return newList;
+        }
+
+        void mergeList(DoublyLinkedList<T>* otherList){
+            if(!otherList || otherList->isEmpty()) return;
+            
+            if(this->isEmpty()){
+                this->head = otherList->head;
+                this->tail = otherList->tail;
+            } else {
+                this->tail->next = otherList->head;
+                otherList->head->prev = this->tail;
+                this->tail = otherList->tail;
+            }
+            
+            otherList->head = nullptr;
+            otherList->tail = nullptr;
         }
 
         Node<T>* operator[](int index){
@@ -184,7 +214,11 @@ class DoublyLinkedList{
         }
 
         Node<T>* insertAtNode(Node<T>* node, T value){
-            if(node == tail || !node){ 
+            if(!node){
+                insertAtHead(value);
+                return head;
+            }
+            if(node == tail){ 
                 insertAtTail(value);
                 return tail;
             }

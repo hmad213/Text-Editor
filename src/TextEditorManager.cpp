@@ -11,12 +11,20 @@ TextEditorManager::~TextEditorManager() {
 }
 
 void TextEditorManager::insertChar(char c) {
-    textEditor->insertChar(c);
+    if(c == '\n')
+        textEditor->addNewLine();
+    else
+        textEditor->insertChar(c);
     updateDisplay();
 }
 
 void TextEditorManager::deleteChar() {
     textEditor->removeChar();
+    updateDisplay();
+}
+
+void TextEditorManager::deleteCharFront(){
+    textEditor->removeCharFront();
     updateDisplay();
 }
 

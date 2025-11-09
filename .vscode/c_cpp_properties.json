@@ -4,16 +4,26 @@
             "name": "Local Qt",
             "includePath": [
                 "${workspaceFolder}/include",
-                "${workspaceFolder}/src",
+                "${workspaceFolder}/src", 
                 "${workspaceFolder}/build",
                 "${workspaceFolder}/forms",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "D:/Qt/6.9.3/mingw_64/include/**",
+                "D:/Qt/6.9.3/mingw_64/include",
+                "D:/Qt/6.9.3/mingw_64/lib/cmake/**"
             ],
-            "defines": [],
-            "compilerPath": "g++",
+            "defines": [
+                "QT_CORE_LIB",
+                "QT_GUI_LIB",
+                "QT_WIDGETS_LIB",
+                "QT_NO_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "g++.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64",
+            "intelliSenseMode": "windows-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],

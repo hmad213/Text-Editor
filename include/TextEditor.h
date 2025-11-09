@@ -18,6 +18,7 @@ class TextEditor{
         void insertString(string value);
 
         void removeChar();
+        void removeCharFront();
 
         void addNewLine();
         void removeLine();
