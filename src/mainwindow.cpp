@@ -1,48 +1,142 @@
 #include "mainwindow.h"
 
-// TextDisplayWidget implementation
+MainWindow::MainWindow(TextEditorManager* manager, QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::TextEditor)
+    , editorManager(manager)
+    , currentText("")
+    , cursorLine(0)
+    , cursorColumn(0)
+{
+    ui->setupUi(this);
+    
+    textDisplayWidget = new TextDisplayWidget(editorManager);
+    ui->verticalLayout->replaceWidget(ui->textArea, textDisplayWidget);
+    delete ui->textArea;
+    ui->textArea = textDisplayWidget;
+
+    textDisplayWidget->setFocus();
+    
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onOpenFile);
+    connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::onSaveFile);
+    connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
+    connect(ui->actionAbout, &QAction::triggered, this, [this]() {
+        QMessageBox::about(this, tr("About Application"),
+                          tr("This is a text editor application made by:\nMuhammad Hammad 24k-0602\nAliyan Masood 24k-1007"));
+    });
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::setText(const string &text)
+{
+    currentText = QString::fromStdString(text);
+    if (textDisplayWidget) {
+        textDisplayWidget->setText(currentText);
+    }
+}
+
+QString MainWindow::getText() const
+{
+    if (textDisplayWidget) {
+        return textDisplayWidget->getText();
+    }
+    return currentText;
+}
+
+void MainWindow::setCursorPosition(int line, int column)
+{
+    cursorLine = line;
+    cursorColumn = column;
+    if (textDisplayWidget) {
+        textDisplayWidget->setCursorPosition(line, column);
+    }
+}
+
+void MainWindow::getCursorPosition(int &line, int &column) const
+{
+    line = cursorLine;
+    column = cursorColumn;
+}
+
+void MainWindow::onSaveFile(){
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        "Save Text File",
+        QDir::homePath(),
+        "Text Files (*.txt);;All Files (*)"
+    );
+    
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(".txt", Qt::CaseInsensitive)) {
+            filePath += ".txt";
+        }
+        
+        if (editorManager) {
+            editorManager->saveToFile(filePath.toStdString());
+        }
+    }
+}
+
+void MainWindow::onOpenFile(){
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        "Open Text File",
+        QDir::homePath(),
+        "Text Files (*.txt);;All Files (*)"
+    );
+    
+    if (!filePath.isEmpty()) {
+        if (editorManager) {
+            editorManager->loadFromFile(filePath.toStdString());
+        }
+    }
+}
+
 TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent) 
     : QWidget(parent)
     , editorManager(manager)
-    , m_cursorLine(0)
-    , m_cursorColumn(0)
-    , m_cursorVisible(true)
-    , m_font("Consolas", 14)
+    , cursorLine(0)
+    , cursorColumn(0)
+    , cursorVisible(true)
+    , font("Consolas", 14)
 {
     setFocusPolicy(Qt::StrongFocus);
-    m_font.setStyleHint(QFont::TypeWriter);
-    setFont(m_font);
+    font.setStyleHint(QFont::TypeWriter);
     setCursor(Qt::IBeamCursor);
     
     // Setup cursor blink timer
-    connect(&m_cursorTimer, &QTimer::timeout, this, &TextDisplayWidget::blinkCursor);
-    m_cursorTimer.start(500); // Blink every 500ms
+    connect(&cursorTimer, &QTimer::timeout, this, &TextDisplayWidget::blinkCursor);
+    cursorTimer.start(500); // Blink every 500ms 
 }
 
 void TextDisplayWidget::setText(const QString &text)
 {
-    m_text = text;
+    this->text = text;
     update();
 }
 
 QString TextDisplayWidget::getText() const
 {
-    return m_text;
+    return text;
 }
 
 void TextDisplayWidget::setCursorPosition(int line, int column)
 {
-    m_cursorLine = line;
-    m_cursorColumn = column;
-    m_cursorVisible = true;
-    m_cursorTimer.start(500); // Reset blink timer
+    cursorLine = line;
+    cursorColumn = column;
+    cursorVisible = true;
+    cursorTimer.start(500); // Reset blink timer
     update();
 }
 
 void TextDisplayWidget::getCursorPosition(int &line, int &column) const
 {
-    line = m_cursorLine;
-    column = m_cursorColumn;
+    line = cursorLine;
+    column = cursorColumn;
 }
 
 void TextDisplayWidget::paintEvent(QPaintEvent *event)
@@ -50,34 +144,34 @@ void TextDisplayWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
-    // Set font
-    painter.setFont(m_font);
-    QFontMetrics fm(m_font);
+    // font
+    painter.setFont(font);
+    QFontMetrics fm(font);
     
-    // Draw background
+    // background
     painter.fillRect(rect(), Qt::white);
     
-    // Draw border
+    // border
     painter.setPen(Qt::gray);
     painter.drawRect(rect().adjusted(0, 0, -1, -1));
     
-    // Draw text
+    // text
     painter.setPen(Qt::black);
     
-    // Split text into lines and draw with cursor
-    QStringList lines = m_text.split('\n');
+    // splitting text into lines and draw with cursor
+    QStringList lines = text.split('\n');
     int y = 5 + fm.ascent();
     
-    for (int i = 0; i < lines.size(); ++i) {
+    for (int i = 0; i < lines.size(); i++) {
         QString line = lines[i];
         
         // Draw the line text
         painter.drawText(5, y, line);
         
         // Draw cursor if this is the current line and cursor is visible
-        if (i == m_cursorLine && m_cursorVisible) {
+        if (i == cursorLine && cursorVisible) {
             // Calculate cursor x position based on text width
-            QString textBeforeCursor = line.left(m_cursorColumn);
+            QString textBeforeCursor = line.left(cursorColumn);
             int cursorX = 5 + fm.horizontalAdvance(textBeforeCursor);
             
             // Draw cursor as a vertical line
@@ -90,7 +184,7 @@ void TextDisplayWidget::paintEvent(QPaintEvent *event)
     }
     
     // Draw cursor at end if no text
-    if (lines.isEmpty() && m_cursorLine == 0 && m_cursorColumn == 0 && m_cursorVisible) {
+    if (lines.isEmpty() && cursorLine == 0 && cursorColumn == 0 && cursorVisible) {
         painter.setPen(QPen(Qt::black, 2));
         painter.drawLine(5, 5, 5, 5 + fm.height());
     }
@@ -98,26 +192,26 @@ void TextDisplayWidget::paintEvent(QPaintEvent *event)
 
 QPoint TextDisplayWidget::getCursorCoordinates() const
 {
-    QFontMetrics fm(m_font);
-    QStringList lines = m_text.split('\n');
+    QFontMetrics fm(font);
+    QStringList lines = text.split('\n');
     
     int x = 5;
     int y = 5;
     
-    if (m_cursorLine < lines.size()) {
-        QString line = lines[m_cursorLine];
-        QString textBeforeCursor = line.left(m_cursorColumn);
+    if (cursorLine < lines.size()) {
+        QString line = lines[cursorLine];
+        QString textBeforeCursor = line.left(cursorColumn);
         x += fm.horizontalAdvance(textBeforeCursor);
     }
     
-    y += m_cursorLine * fm.height() + fm.ascent();
+    y += cursorLine * fm.height() + fm.ascent();
     
     return QPoint(x, y);
 }
 
 void TextDisplayWidget::blinkCursor()
 {
-    m_cursorVisible = !m_cursorVisible;
+    cursorVisible = !cursorVisible;
     update();
 }
 
@@ -128,7 +222,6 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    // Handle key events directly with the manager
     if (event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) {
         QWidget::keyPressEvent(event);
         return;
@@ -178,8 +271,8 @@ void TextDisplayWidget::mousePressEvent(QMouseEvent *event)
     }
 
     // Calculate cursor position from mouse click
-    QFontMetrics fm(m_font);
-    QStringList lines = m_text.split('\n');
+    QFontMetrics fm(font);
+    QStringList lines = text.split('\n');
     
     int clickY = event->pos().y();
     int line = qBound(0, (clickY - 5) / fm.height(), lines.size() - 1);
@@ -202,108 +295,4 @@ void TextDisplayWidget::mousePressEvent(QMouseEvent *event)
     editorManager->setCursorPosition(line, column);
     setFocus();
     QWidget::mousePressEvent(event);
-}
-
-// MainWindow implementation
-MainWindow::MainWindow(TextEditorManager* manager, QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::TextEditor)
-    , textDisplayWidget(nullptr)
-    , editorManager(manager)
-    , currentText("")
-    , cursorLine(0)
-    , cursorColumn(0)
-{
-    ui->setupUi(this);
-    
-    textDisplayWidget = new TextDisplayWidget(editorManager);
-    ui->verticalLayout->replaceWidget(ui->textArea, textDisplayWidget);
-    delete ui->textArea;
-    ui->textArea = textDisplayWidget;
-
-    textDisplayWidget->setFocus();
-    
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onOpenFile);
-    connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::onSaveFile);
-    connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
-    connect(ui->actionAbout, &QAction::triggered, this, [this]() {
-        QMessageBox::about(this, tr("About Application"),
-                          tr("This is a text editor application made by:\nMuhammad Hammad 24k-0602\nAliyan Masood 24k-1007"));
-    });
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
-void MainWindow::setText(const std::string &text)
-{
-    currentText = QString::fromStdString(text);
-    if (textDisplayWidget) {
-        textDisplayWidget->setText(currentText);
-    }
-}
-
-QString MainWindow::getText() const
-{
-    if (textDisplayWidget) {
-        return textDisplayWidget->getText();
-    }
-    return currentText;
-}
-
-void MainWindow::setCursorPosition(int line, int column)
-{
-    cursorLine = line;
-    cursorColumn = column;
-    if (textDisplayWidget) {
-        textDisplayWidget->setCursorPosition(line, column);
-    }
-}
-
-void MainWindow::getCursorPosition(int &line, int &column) const
-{
-    line = cursorLine;
-    column = cursorColumn;
-}
-
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-    emit keyPressed(event);
-    QMainWindow::keyPressEvent(event);
-}
-
-void MainWindow::onSaveFile(){
-    QString filePath = QFileDialog::getSaveFileName(
-        this,
-        "Save Text File",
-        QDir::homePath(),
-        "Text Files (*.txt);;All Files (*)"
-    );
-    
-    if (!filePath.isEmpty()) {
-        if (!filePath.endsWith(".txt", Qt::CaseInsensitive)) {
-            filePath += ".txt";
-        }
-        
-        if (editorManager) {
-            editorManager->saveToFile(filePath.toStdString());
-        }
-    }
-}
-
-void MainWindow::onOpenFile(){
-    QString filePath = QFileDialog::getOpenFileName(
-        this,
-        "Open Text File",
-        QDir::homePath(),
-        "Text Files (*.txt);;All Files (*)"
-    );
-    
-    if (!filePath.isEmpty()) {
-        if (editorManager) {
-            editorManager->loadFromFile(filePath.toStdString());
-        }
-    }
 }

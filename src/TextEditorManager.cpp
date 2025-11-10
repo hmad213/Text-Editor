@@ -4,7 +4,8 @@
 
 TextEditorManager::TextEditorManager() {
     textEditor = new TextEditor();
-    mainWindow = new MainWindow(this); // Pass 'this' to MainWindow
+    // passing pointer to mainWindow
+    mainWindow = new MainWindow(this);
 }
 
 TextEditorManager::~TextEditorManager() {
