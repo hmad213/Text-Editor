@@ -23,37 +23,30 @@ TextEditor::~TextEditor(){
 
 
 void TextEditor::insertString(string value) {
-    // ✅ Clean up existing lines safely
-    while (text.head != nullptr) {
-        DoublyLinkedList<char>* line = text.head->value;
-        delete line;
-        Node<DoublyLinkedList<char>*>* temp = text.head;
-        text.head = text.head->next;
-        delete temp;
+    while (text.getHead() != nullptr) {
+        text.removeFromHead();
     }
-    text.tail = nullptr;
 
-    // ✅ Reset editor state
     currentNode = nullptr;
     currentLineNode = nullptr;
     nodeIndex = 0;
     lineIndex = 0;
 
-    // ✅ Ensure at least one line exists before inserting chars
-    addNewLine();
+    DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
+    text.insertAtHead(newList);
+    currentLineNode = text.getHead();
 
-    // ✅ Loop through all characters and handle newline
-    for (char c : value) {
-        if (c == '\n') {
+    for (int i = 0; i < value.size(); i++) {
+        if (value[i] == '\n') {
             addNewLine();
+            lineIndex++;
         } else {
-            insertChar(c);
+            insertChar(value[i]);
         }
     }
   
-    // ✅ Set cursor to beginning (or end, depending on desired behavior)
-    currentLineNode = text.head;
-    currentNode = currentLineNode ? currentLineNode->value->head : nullptr;
+    currentLineNode = text.getHead();
+    currentNode = nullptr;
     lineIndex = 0;
     nodeIndex = 0;
 }
