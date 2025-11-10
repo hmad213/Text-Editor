@@ -21,17 +21,94 @@ TextEditor::~TextEditor(){
     }
 }
 
-void TextEditor::insertChar(char value){
+// void TextEditor::insertChar(char value){
+//     currentNode = currentLineNode->value->insertAtNode(currentNode, value);
+//     nodeIndex++;
+//     cout << lineIndex << ", " << nodeIndex << endl;
+// }
+void TextEditor::insertChar(char value) {
+    // ✅ Make sure there is at least one line to insert into
+    if (currentLineNode == nullptr) {
+        addNewLine();  // create a new line and set currentLineNode
+        currentNode = nullptr;
+        nodeIndex = 0;
+        lineIndex = 0;
+    }
+
+    // ✅ Ensure the line exists
+    if (currentLineNode->value == nullptr) {
+        currentLineNode->value = new DoublyLinkedList<char>();
+    }
+
+    // ✅ Now safely insert at current position
     currentNode = currentLineNode->value->insertAtNode(currentNode, value);
     nodeIndex++;
+
     cout << lineIndex << ", " << nodeIndex << endl;
 }
 
 // TODO: loop through the string and use insertChar to insert all the characters.
 // Specical case: \n. Use addNewLine()
-void TextEditor::insertString(string value){
+// void TextEditor::insertString(string value){
+//      Node<DoublyLinkedList<char>*>* currentLine = text[0];
+//     while (currentLine != nullptr) {
+//         DoublyLinkedList<char>* line = currentLine->value;
+//         if (line != nullptr) {
+//             delete line;
+//         }
+//         currentLine = currentLine->next;
+//     }
+//         text.head = text.tail = nullptr;
+//         for (char c : value) {
+//             if (c == '\n') {
+//                 addNewLine();
+//             } else {
+//                 insertChar(c);
+//             }
+//         }
+//         if (currentLine->next != nullptr || text.head == nullptr)
+//             text.tail = currentLine;
+//         currentLineNode = text.head;
+//         currentNode = currentLineNode ? currentLineNode->value->head : nullptr;
+//         lineIndex = 0;
+//         nodeIndex = 0;
+// }
+void TextEditor::insertString(string value) {
+    // ✅ Clean up existing lines safely
+    while (text.head != nullptr) {
+        DoublyLinkedList<char>* line = text.head->value;
+        delete line;
+        Node<DoublyLinkedList<char>*>* temp = text.head;
+        text.head = text.head->next;
+        delete temp;
+    }
+    text.tail = nullptr;
 
+    // ✅ Reset editor state
+    currentNode = nullptr;
+    currentLineNode = nullptr;
+    nodeIndex = 0;
+    lineIndex = 0;
+
+    // ✅ Ensure at least one line exists before inserting chars
+    addNewLine();
+
+    // ✅ Loop through all characters and handle newline
+    for (char c : value) {
+        if (c == '\n') {
+            addNewLine();
+        } else {
+            insertChar(c);
+        }
+    }
+
+    // ✅ Set cursor to beginning (or end, depending on desired behavior)
+    currentLineNode = text.head;
+    currentNode = currentLineNode ? currentLineNode->value->head : nullptr;
+    lineIndex = 0;
+    nodeIndex = 0;
 }
+
 
 void TextEditor::removeChar(){
     if(!currentNode){
@@ -56,20 +133,40 @@ void TextEditor::removeCharFront(){
 // TODO: add a new line. A line in this case is a new node of DoublyLinkedList<char>*. Make sure to dynamically allocate
 // Special Case: Pressing enter in the middle of the line. use the function in DoublyLinkedList.hpp splitList
 // Note: The splitList function is not completed.
-void TextEditor::addNewLine(){
-    if(nodeIndex <= 0){
-        DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
-        text.insertAtIndex(lineIndex, newList);
+
+
+void TextEditor::addNewLine() {
+    DoublyLinkedList<char>* newLine = new DoublyLinkedList<char>();
+
+    if (text.head == nullptr) {
+        // First line in the text
+        text.append(newLine);
+        currentLineNode = text.head;
+        lineIndex = 0;
+    } else {
+        // Insert new line after the current line
+        currentLineNode = text.insertAfter(currentLineNode, newLine);
         lineIndex++;
-    }else{
-        DoublyLinkedList<char>* newList = currentLineNode->value->splitList(nodeIndex - 1);
-        text.insertAtNode(currentLineNode, newList);
-        currentLineNode = currentLineNode->next;
-        lineIndex++;
-        nodeIndex = 0;
-        currentNode = nullptr;
     }
+
+    currentNode = nullptr;
+    nodeIndex = 0;
 }
+
+// void TextEditor::addNewLine(){
+//     if(nodeIndex <= 0){
+//         DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
+//         text.insertAtIndex(lineIndex, newList);
+//         lineIndex++;
+//     }else{
+//         DoublyLinkedList<char>* newList = currentLineNode->value->splitList(nodeIndex - 1);
+//         text.insertAtNode(currentLineNode, newList);
+//         currentLineNode = currentLineNode->next;
+//         lineIndex++;
+//         nodeIndex = 0;
+//         currentNode = nullptr;
+//     }
+// }
 
 // TODO: remove a line. A line in this case is a new node of DoublyLinkedList<char>*.
 // Special Case: Pressing backspace at the start of the line in which case it will merge this linked list with the previous one
@@ -215,7 +312,7 @@ string TextEditor::getText(){
         while(cur != nullptr){
             str += cur->value;
             cur = cur->next;
-        }
+        } 
         line = line->next;
         if(line)
         str += '\n';
@@ -231,3 +328,6 @@ int TextEditor::getLineIndex(){
 int TextEditor::getNodeIndex(){
     return nodeIndex;
 }
+// void TextEditor::ConvertToLinkedList(const string& input){
+     
+// };
