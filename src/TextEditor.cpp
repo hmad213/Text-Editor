@@ -21,14 +21,47 @@ TextEditor::~TextEditor(){
     }
 }
 
+
+void TextEditor::insertString(string value) {
+    // ✅ Clean up existing lines safely
+    while (text.head != nullptr) {
+        DoublyLinkedList<char>* line = text.head->value;
+        delete line;
+        Node<DoublyLinkedList<char>*>* temp = text.head;
+        text.head = text.head->next;
+        delete temp;
+    }
+    text.tail = nullptr;
+
+    // ✅ Reset editor state
+    currentNode = nullptr;
+    currentLineNode = nullptr;
+    nodeIndex = 0;
+    lineIndex = 0;
+
+    // ✅ Ensure at least one line exists before inserting chars
+    addNewLine();
+
+    // ✅ Loop through all characters and handle newline
+    for (char c : value) {
+        if (c == '\n') {
+            addNewLine();
+        } else {
+            insertChar(c);
+        }
+    }
+  
+    // ✅ Set cursor to beginning (or end, depending on desired behavior)
+    currentLineNode = text.head;
+    currentNode = currentLineNode ? currentLineNode->value->head : nullptr;
+    lineIndex = 0;
+    nodeIndex = 0;
+}
+
 void TextEditor::insertChar(char value){
     // uses insertAtNode in DoublyLinkedList
     currentNode = currentLineNode->value->insertAtNode(currentNode, value);
     nodeIndex++;
-}
-
-void TextEditor::insertString(string value){
-
 }
 
 void TextEditor::removeChar(){
@@ -69,9 +102,10 @@ void TextEditor::addNewLine(){
         text.insertAtNode(currentLineNode, newList);
         currentLineNode = currentLineNode->next;
         lineIndex++;
-        nodeIndex = 0;
-        currentNode = nullptr;
     }
+
+    currentNode = nullptr;
+    nodeIndex = 0;
 }
 
 void TextEditor::removeLine(){
@@ -196,7 +230,7 @@ string TextEditor::getText(){
         while(cur != nullptr){
             str += cur->value;
             cur = cur->next;
-        }
+        } 
 
         line = line->next;
         if(line)
