@@ -1,4 +1,6 @@
 #include "TextEditorManager.h"
+#include <fstream>
+#include <sstream>
 
 TextEditorManager::TextEditorManager() {
     textEditor = new TextEditor();
@@ -52,9 +54,25 @@ void TextEditorManager::updateDisplay() {
 }
 
 void TextEditorManager::saveToFile(const string& filePath){
+    string text= textEditor->getText();
+    ofstream file(filePath,ios::out);
+    if (file.is_open()) {
+        file << text;
+        file.close();
+    } else {
+        cout << "Error opening file.\n";
+    }
 
 }
-
 void TextEditorManager::loadFromFile(const string& filePath){
-
+    ifstream file(filePath,ios::in);
+    if (!file.is_open()) {
+    cout << "Error opening file.\n";
+    return;
+}
+stringstream buffer;
+buffer << file.rdbuf();
+string data = buffer.str();
+textEditor->insertString(data);
+updateDisplay();
 }
