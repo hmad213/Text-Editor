@@ -68,12 +68,12 @@ void TextEditorManager::saveToFile(const string& filePath){
 void TextEditorManager::loadFromFile(const string& filePath){
     ifstream file(filePath,ios::in);
     if (!file.is_open()) {
-    cout << "Error opening file.\n";
-    return;
-}
-stringstream buffer;
-buffer << file.rdbuf();
-string data = buffer.str();
-textEditor->insertString(data);
-updateDisplay();
+        cout << "Error opening file.\n";
+        return;
+    }
+    stringstream buffer;
+    buffer << file.rdbuf();
+    string data = buffer.str();
+    textEditor->overwriteText(data);
+    updateDisplay();
 }

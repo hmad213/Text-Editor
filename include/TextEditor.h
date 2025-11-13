@@ -4,6 +4,16 @@
 #include "DoublyLinkedList.hpp"
 using namespace std;
 
+struct Selection{
+    bool isSelecting;
+    int startLine;
+    int startNode;
+    int endLine;
+    int endNode;
+
+    Selection() : isSelecting(false), startLine(0), startNode(0), endLine(0), endNode(0){}
+};
+
 class TextEditor{
     private:
         DoublyLinkedList<DoublyLinkedList<char>*> text;
@@ -11,9 +21,13 @@ class TextEditor{
         Node<DoublyLinkedList<char>*>* currentLineNode;
         int nodeIndex;
         int lineIndex;
+        Selection selection;
     public:
         TextEditor();
         ~TextEditor();
+        void initialize();
+
+        void overwriteText(string value);
 
         void insertChar(char value);
         void insertString(string value);
@@ -27,6 +41,11 @@ class TextEditor{
         void moveCursor(int x, int y);
 
         void setCursorPosition(int lineIndex, int nodeIndex);
+
+        void startSelection();
+        void updateSelection();
+        void endSelection();
+        string getSelectedText();
 
         string getText();
         int getLineIndex();

@@ -21,12 +21,25 @@ TextEditor::~TextEditor(){
     }
 }
 
-
-void TextEditor::insertString(string value) {
+void TextEditor::initialize(){
     while (text.getHead() != nullptr) {
         text.removeFromHead();
     }
 
+    nodeIndex = 0;
+    lineIndex = 0;
+    currentNode = nullptr;
+    DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
+    text.insertAtHead(newList);
+    currentLineNode = text.getHead();
+}
+
+void TextEditor::overwriteText(string value){
+    initialize();
+    insertString(value);
+}
+
+void TextEditor::insertString(string value) {
     currentNode = nullptr;
     currentLineNode = nullptr;
     nodeIndex = 0;
@@ -227,6 +240,61 @@ string TextEditor::getText(){
 
         line = line->next;
         if(line)
+        str += '\n';
+    }
+
+    return str;
+}
+
+void TextEditor::startSelection(){
+    selection.isSelecting = true;
+    selection.startLine = lineIndex;
+    selection.startNode = nodeIndex;
+    selection.endLine = lineIndex;
+    selection.endNode = nodeIndex;
+}
+
+void TextEditor::updateSelection(){
+    if(selection.isSelecting){
+        selection.endLine = lineIndex;
+        selection.endNode = nodeIndex;
+    }
+}
+
+void TextEditor::endSelection(){
+    selection.isSelecting = false;
+}
+
+string TextEditor::getSelectedText(){
+    if (!selection.isSelecting) return "";
+
+    string str = "";
+
+    int startLine = selection.startLine;
+    int endLine = selection.endLine;
+    int startNode = selection.startNode;
+    int endNode = selection.endNode;
+
+    if (startLine > endLine || (startLine == endLine && startNode > endNode)) {
+        swap(startLine, endLine);
+        swap(startNode, endNode);
+    }
+
+    Node<DoublyLinkedList<char>*>* line = text[selection.startLine];
+
+    int i = startLine, j = startNode;
+    while(i <= selection.endLine && line != nullptr){
+        Node<char>* cur = (*line->value)[j];
+
+        while(cur != nullptr && (endLine == i && selection.endNode >= j)){
+            str += cur->value;
+            cur = cur->next;
+            j++;
+        }
+        j = 0;
+        i++;
+        line = line->next;
+        if(line && i < selection.endLine)
         str += '\n';
     }
 
