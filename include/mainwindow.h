@@ -52,6 +52,7 @@ class MainWindow : public QMainWindow
     private slots:
         void onSaveFile();
         void onOpenFile();
+        void onNewFile();
 };
 
 // Custom widget class declared in header
@@ -67,7 +68,11 @@ class TextDisplayWidget : public QWidget
         bool cursorVisible;
         QTimer cursorTimer;
         QFont font;
-        
+        bool selecting;
+        QPoint selectionStart;
+        QPoint selectionEnd;
+
+        void getSelectionBounds(int &startLine, int &startCol, int &endLine, int &endCol) const;
         QPoint getCursorCoordinates() const;
 
     public:
@@ -83,6 +88,8 @@ class TextDisplayWidget : public QWidget
         void paintEvent(QPaintEvent *event) override;
         void keyPressEvent(QKeyEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
+        void mouseMoveEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
 
     private slots:
         void blinkCursor();

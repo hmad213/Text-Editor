@@ -13,7 +13,15 @@ TextEditorManager::~TextEditorManager() {
     delete mainWindow;
 }
 
+void TextEditorManager::initializeEditor(){
+    textEditor->initialize();
+    updateDisplay();
+}
+
 void TextEditorManager::insertChar(char c) {
+    if(textEditor->hasSelection()){
+        textEditor->deleteSelection();
+    }
     if(c == '\n')
         textEditor->addNewLine();
     else
@@ -22,12 +30,20 @@ void TextEditorManager::insertChar(char c) {
 }
 
 void TextEditorManager::deleteChar() {
-    textEditor->removeChar();
+    if(textEditor->hasSelection()){
+        textEditor->deleteSelection();
+    }else{
+        textEditor->removeChar();
+    }
     updateDisplay();
 }
 
 void TextEditorManager::deleteCharFront(){
-    textEditor->removeCharFront();
+    if(textEditor->hasSelection()){
+        textEditor->deleteSelection();
+    }else{
+        textEditor->removeCharFront();
+    }
     updateDisplay();
 }
 
@@ -52,6 +68,59 @@ void TextEditorManager::run() {
 void TextEditorManager::updateDisplay() {
     mainWindow->setText(textEditor->getText());
     mainWindow->setCursorPosition(textEditor->getLineIndex(), textEditor->getNodeIndex());
+}
+
+void TextEditorManager::startSelection(){
+    textEditor->startSelection();
+}
+
+void TextEditorManager::updateSelection(){
+    textEditor->updateSelection();
+}
+
+void TextEditorManager::clearSelection(){
+    textEditor->endSelection();
+}
+
+std::string TextEditorManager::getSelectedText(){
+    return textEditor->getSelectedText();
+}
+
+Selection TextEditorManager::getSelectionDetails(){
+    return textEditor->getSelectionDetails();
+}
+
+bool TextEditorManager::hasSelection(){
+    return textEditor->hasSelection();
+}
+
+void TextEditorManager::copyToClipboard() {
+    if (textEditor->getSelectionDetails().isSelecting) {
+        string selectedText = textEditor->getSelectedText();
+        QApplication::clipboard()->setText(QString::fromStdString(selectedText));
+    }
+}
+
+void TextEditorManager::cutToClipboard() {
+    if (textEditor->getSelectionDetails().isSelecting) {
+        string selectedText = textEditor->getSelectedText();
+        QApplication::clipboard()->setText(QString::fromStdString(selectedText));
+        
+        textEditor->deleteSelection();
+        updateDisplay();
+    }
+}
+
+void TextEditorManager::pasteFromClipboard() {
+    QString clipboardText = QApplication::clipboard()->text();
+    if (!clipboardText.isEmpty()) {
+        if (textEditor->hasSelection()) {
+            textEditor->deleteSelection();
+        }
+        
+        textEditor->insertString(clipboardText.toStdString());
+        updateDisplay();
+    }
 }
 
 void TextEditorManager::saveToFile(const string& filePath){

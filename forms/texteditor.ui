@@ -44,6 +44,7 @@ border: 1px solid gray;</string>
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
@@ -58,6 +59,11 @@ border: 1px solid gray;</string>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
+  <action name="actionNew">
+    <property name="text">
+      <string>New</string>
+    </property>
+  </action>
   <action name="actionOpen">
    <property name="text">
     <string>&amp;Open</string>

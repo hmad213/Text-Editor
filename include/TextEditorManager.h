@@ -2,6 +2,8 @@
 
 #include "TextEditor.h"
 #include "mainwindow.h"
+#include <QApplication>
+#include <QClipboard>
 class MainWindow;
 
 class TextEditorManager{
@@ -12,6 +14,7 @@ class TextEditorManager{
     public:
         TextEditorManager();
         ~TextEditorManager();
+        void initializeEditor();
 
         void insertChar(char c);
 
@@ -25,6 +28,17 @@ class TextEditorManager{
 
         void saveToFile(const string& filePath);
         void loadFromFile(const string& filePath);
+
+        void startSelection();
+        void updateSelection();
+        void clearSelection();
+        std::string getSelectedText();
+        Selection getSelectionDetails();
+        bool hasSelection();
+
+        void copyToClipboard();
+        void cutToClipboard();
+        void pasteFromClipboard();
 
         void updateDisplay();
         void run();

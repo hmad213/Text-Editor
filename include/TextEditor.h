@@ -45,7 +45,10 @@ class TextEditor{
         void startSelection();
         void updateSelection();
         void endSelection();
+        void deleteSelection();
         string getSelectedText();
+        Selection getSelectionDetails();
+        bool hasSelection();
 
         string getText();
         int getLineIndex();

@@ -40,28 +40,13 @@ void TextEditor::overwriteText(string value){
 }
 
 void TextEditor::insertString(string value) {
-    currentNode = nullptr;
-    currentLineNode = nullptr;
-    nodeIndex = 0;
-    lineIndex = 0;
-
-    DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
-    text.insertAtHead(newList);
-    currentLineNode = text.getHead();
-
     for (int i = 0; i < value.size(); i++) {
         if (value[i] == '\n') {
             addNewLine();
-            lineIndex++;
         } else {
             insertChar(value[i]);
         }
     }
-  
-    currentLineNode = text.getHead();
-    currentNode = nullptr;
-    lineIndex = 0;
-    nodeIndex = 0;
 }
 
 void TextEditor::insertChar(char value){
@@ -265,8 +250,44 @@ void TextEditor::endSelection(){
     selection.isSelecting = false;
 }
 
+void TextEditor::deleteSelection(){
+    if (!hasSelection()) return;
+
+
+    int startLine = selection.startLine;
+    int endLine = selection.endLine;
+    int startNode = selection.startNode;
+    int endNode = selection.endNode;
+
+    if (startLine > endLine || (startLine == endLine && startNode > endNode)) {
+        swap(startLine, endLine);
+        swap(startNode, endNode);
+    }
+
+    setCursorPosition(startLine, startNode);
+
+    int totalChars = 0;
+    if (startLine == endLine) {
+        totalChars = endNode - startNode;
+    } else {
+        Node<DoublyLinkedList<char>*>* line = text[startLine];
+        for (int i = startLine; i <= endLine; i++) {
+            int lineStart = (i == startLine) ? startNode : 0;
+            int lineEnd = (i == endLine) ? endNode : line->value->getSize();
+            totalChars += (lineEnd - lineStart);
+            line = line->next;
+        }
+    }
+
+    for (int i = 0; i < totalChars; i++) {
+        removeCharFront();
+    }
+
+    selection.isSelecting = false;
+}
+
 string TextEditor::getSelectedText(){
-    if (!selection.isSelecting) return "";
+    if (!hasSelection()) return "";
 
     string str = "";
 
@@ -280,13 +301,13 @@ string TextEditor::getSelectedText(){
         swap(startNode, endNode);
     }
 
-    Node<DoublyLinkedList<char>*>* line = text[selection.startLine];
+    Node<DoublyLinkedList<char>*>* line = text[startLine];
 
     int i = startLine, j = startNode;
-    while(i <= selection.endLine && line != nullptr){
+    while(i <= endLine && line != nullptr){
         Node<char>* cur = (*line->value)[j];
 
-        while(cur != nullptr && (endLine == i && selection.endNode >= j)){
+        while(cur != nullptr && ((endLine != i) || (endLine == i && endNode > j))){
             str += cur->value;
             cur = cur->next;
             j++;
@@ -294,11 +315,18 @@ string TextEditor::getSelectedText(){
         j = 0;
         i++;
         line = line->next;
-        if(line && i < selection.endLine)
+        if(i <= endLine && line)
         str += '\n';
     }
-
     return str;
+}
+
+Selection TextEditor::getSelectionDetails(){
+    return selection;
+}
+
+bool TextEditor::hasSelection(){
+    return (selection.isSelecting && !(selection.startLine == selection.endLine & selection.startNode == selection.endNode));
 }
 
 int TextEditor::getLineIndex(){
