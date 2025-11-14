@@ -305,7 +305,12 @@ string TextEditor::getSelectedText(){
 
     int i = startLine, j = startNode;
     while(i <= endLine && line != nullptr){
-        Node<char>* cur = (*line->value)[j];
+        int size = (*line->value).getSize();
+        Node<char>* cur;
+        if(j < size)
+            cur = (*line->value)[j];
+        else
+            cur = nullptr;
 
         while(cur != nullptr && ((endLine != i) || (endLine == i && endNode > j))){
             str += cur->value;
