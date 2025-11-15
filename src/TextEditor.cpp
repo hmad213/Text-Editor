@@ -71,14 +71,27 @@ void TextEditor::removeCharFront(){
     // TODO: add removing of line
     // Special case: if cursor is at the start of line, remove from head if it exists
     if(!currentNode){
-        if(!currentLineNode->value->getHead()) return;
-        currentLineNode->value->removeFromHead();
+        if(!currentLineNode->value->getHead() && currentLineNode->next){
+            lineIndex++;
+            currentLineNode = currentLineNode->next;
+            removeLine();
+        }
+        if(currentLineNode->value->getHead())
+            currentLineNode->value->removeFromHead();
+        cout << getText();
         return;                    
     }
-    if(!currentNode->next) return;  // TODO: add removing of line
+    if(!currentNode->next && currentLineNode->next){
+        lineIndex++;
+        currentLineNode = currentLineNode->next;
+        removeLine();
+        currentNode = currentLineNode->value->removeFromNode(currentNode->next);
+    }
 
     // uses removeFromNode in DoublyLinkedList
-    currentNode = currentLineNode->value->removeFromNode(currentNode->next);
+    if(currentNode->next)
+        currentNode = currentLineNode->value->removeFromNode(currentNode->next);
+    cout << getText();
 }
 
 void TextEditor::addNewLine(){

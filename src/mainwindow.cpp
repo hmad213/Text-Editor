@@ -178,7 +178,7 @@ void TextDisplayWidget::paintEvent(QPaintEvent *event){
         if (editorManager && editorManager->hasSelection() && i >= startLine && i <= endLine) {      
             int selStart = (i == startLine) ? startCol : 0;
             int selEnd = (i == endLine) ? endCol : line.length();
-            if(endCol == 0 && i == endLine || startCol == line.size()){
+            if(endCol == 0 && i == endLine || startCol == line.size() && startLine == i){
                 painter.setPen(Qt::black);
                 painter.drawText(x, y, line);
             }
