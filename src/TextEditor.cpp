@@ -344,7 +344,7 @@ Selection TextEditor::getSelectionDetails(){
 }
 
 bool TextEditor::hasSelection(){
-    return (selection.isSelecting && !(selection.startLine == selection.endLine & selection.startNode == selection.endNode));
+    return (selection.isSelecting && !(selection.startLine == selection.endLine && selection.startNode == selection.endNode));
 }
 
 int TextEditor::getLineIndex(){
