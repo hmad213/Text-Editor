@@ -94,6 +94,10 @@ bool TextEditorManager::hasSelection(){
     return textEditor->hasSelection();
 }
 
+DynamicArray<string> TextEditorManager::getAutocompleteSuggestions(){
+    return textEditor->getAutocompleteSuggestions();
+}
+
 void TextEditorManager::copyToClipboard() {
     if (textEditor->getSelectionDetails().isSelecting) {
         string selectedText = textEditor->getSelectedText();

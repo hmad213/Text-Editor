@@ -1,6 +1,8 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include "Queue.hpp"
+#include "DynamicArray.hpp"
 using namespace std;
 
 struct TrieNode{
@@ -37,8 +39,8 @@ class Trie{
             cur->isWord = true;
         }
 
-        vector<string> findClosestWord(const string& prefix, int n){
-            vector<string> words;
+        DynamicArray<string> findClosestWord(const string& prefix, int n){
+            DynamicArray<string> words;
             TrieNode* cur = root;
 
             for(int i = 0; i < prefix.size(); i++){
@@ -58,9 +60,9 @@ class Trie{
                     i++;
                 }
 
-                for(int i = 0; i < 26; i++){
-                    if(temp.first->nodes[i] != nullptr){
-                        q.enqueue({temp.first->nodes[i], temp.second + char(i + 'a')});
+                for(int j = 0; j < 26; j++){
+                    if(temp.first->nodes[j] != nullptr){
+                        q.enqueue({temp.first->nodes[j], temp.second + char(j + 'a')});
                     }
                 }
             }

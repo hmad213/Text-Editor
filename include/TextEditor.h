@@ -1,7 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
+#include "DynamicArray.hpp"
 #include "DoublyLinkedList.hpp"
+#include "Autocomplete.h"
 using namespace std;
 
 struct Selection{
@@ -17,10 +20,14 @@ struct Selection{
 class TextEditor{
     private:
         DoublyLinkedList<DoublyLinkedList<char>*> text;
+
         Node<char>* currentNode;
         Node<DoublyLinkedList<char>*>* currentLineNode;
         int nodeIndex;
         int lineIndex;
+
+        Autocomplete* autocomplete;
+
         Selection selection;
     public:
         TextEditor();
@@ -50,7 +57,10 @@ class TextEditor{
         Selection getSelectionDetails();
         bool hasSelection();
 
+        DynamicArray<string> getAutocompleteSuggestions();
+
         string getText();
         int getLineIndex();
         int getNodeIndex();
+        string getPrefix();
 };

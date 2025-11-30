@@ -2,6 +2,7 @@
 
 Autocomplete::Autocomplete(){
     wordTrie = new Trie();
+    insertFromFile("dictionary.txt");
 }
 
 Autocomplete::~Autocomplete(){
@@ -13,7 +14,7 @@ void Autocomplete::insertString(const string& value){
 }
 
 void Autocomplete::insertFromFile(const string& fileName){
-    ifstream file("C:\\Users\\GIGABYTE\\Desktop\\dictionary.txt");
+    ifstream file(fileName);
 
     if (!file.is_open()) throw invalid_argument("File does not exist");
 
@@ -25,6 +26,6 @@ void Autocomplete::insertFromFile(const string& fileName){
     file.close();
 }
 
-vector<string> Autocomplete::findClosestWords(const string& prefix, int n){
+DynamicArray<string> Autocomplete::findClosestWords(const string& prefix, int n){
     return wordTrie->findClosestWord(prefix, n);
 }

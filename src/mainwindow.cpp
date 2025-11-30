@@ -116,6 +116,10 @@ TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent
     font.setStyleHint(QFont::TypeWriter);
     setCursor(Qt::IBeamCursor);
 
+    autocompletePopup = new QListWidget(this);
+    autocompletePopup->setWindowFlags(Qt::ToolTip);
+    connect(autocompletePopup, &QListWidget::itemClicked, this, &TextDisplayWidget::clickAutocompletePopup);
+
     setMouseTracking(true);
     
     // Setup cursor blink timer
@@ -255,6 +259,38 @@ void TextDisplayWidget::blinkCursor()
     update();
 }
 
+void TextDisplayWidget::clickAutocompletePopup(QListWidgetItem* item)
+{
+    QString word = item->text();
+    autocompletePopup->hide();
+}
+
+void TextDisplayWidget::showAutocomplete(){
+    DynamicArray<string> suggestions = editorManager->getAutocompleteSuggestions();
+    if(suggestions.size() == 0){
+        cout << "hey" << endl;
+        autocompletePopup->hide();
+        return;
+    }
+
+    for(int i = 0; i < suggestions.size(); i++){
+        cout << suggestions[i] << " ";
+    }
+    cout << endl;
+
+    autocompletePopup->clear();
+
+    for(int i = 0; i < suggestions.size(); i++){
+        autocompletePopup->addItem(QString::fromStdString(suggestions[i]));
+    }
+
+    QPoint pos = getCursorCoordinates();
+    pos.setY(pos.y() + fontMetrics().height());
+    autocompletePopup->move(mapToGlobal(pos));
+
+    autocompletePopup->show();
+}
+
 void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
 {
     if (!editorManager) {
@@ -312,6 +348,7 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
         default:
             if (!event->text().isEmpty() && event->text().at(0).isPrint()) {
                 editorManager->insertChar(event->text().at(0).toLatin1());
+                showAutocomplete();
             }
             break;
     }

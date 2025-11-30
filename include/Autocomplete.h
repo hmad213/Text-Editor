@@ -1,7 +1,8 @@
+#pragma once
 #include <Trie.hpp>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include "DynamicArray.hpp"
 using namespace std;
 
 class Autocomplete{
@@ -13,5 +14,5 @@ class Autocomplete{
 
         void insertString(const string& value);
         void insertFromFile(const string& fileName);
-        vector<string> findClosestWords(const string& prefix, int n);
+        DynamicArray<string> findClosestWords(const string& prefix, int n);
 };

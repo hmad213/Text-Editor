@@ -2,6 +2,7 @@
 
 #include "TextEditor.h"
 #include "mainwindow.h"
+#include "DynamicArray.hpp"
 #include <QApplication>
 #include <QClipboard>
 class MainWindow;
@@ -34,6 +35,7 @@ class TextEditorManager{
         void clearSelection();
         std::string getSelectedText();
         Selection getSelectionDetails();
+        DynamicArray<string> getAutocompleteSuggestions();
         bool hasSelection();
 
         void copyToClipboard();
