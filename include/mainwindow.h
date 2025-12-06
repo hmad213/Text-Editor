@@ -71,6 +71,7 @@ class TextDisplayWidget : public QWidget
         bool cursorVisible;
         QTimer cursorTimer;
         QFont font;
+        QFont autocompleteFont;
         bool selecting;
         QPoint selectionStart;
         QPoint selectionEnd;
@@ -88,6 +89,8 @@ class TextDisplayWidget : public QWidget
         void getCursorPosition(int &line, int &column) const;
 
         void showAutocomplete();
+        void updateAutocomplete();
+        void resizeAutocompletePopup(int count);
 
     protected:
         void paintEvent(QPaintEvent *event) override;

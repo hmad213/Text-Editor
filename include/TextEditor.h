@@ -58,6 +58,7 @@ class TextEditor{
         bool hasSelection();
 
         DynamicArray<string> getAutocompleteSuggestions();
+        void autocompleteText(string word);
 
         string getText();
         int getLineIndex();

@@ -358,6 +358,13 @@ DynamicArray<string> TextEditor::getAutocompleteSuggestions(){
     return temp;
 }
 
+void TextEditor::autocompleteText(string word){
+    string prefix = getPrefix();
+    for(int i = prefix.size(); i < word.size(); i++){
+        insertChar(word[i]);
+    }
+}
+
 int TextEditor::getLineIndex(){
     return lineIndex;
 }

@@ -127,6 +127,11 @@ void TextEditorManager::pasteFromClipboard() {
     }
 }
 
+void TextEditorManager::autocompleteText(string word){
+    textEditor->autocompleteText(word);
+    updateDisplay();
+}
+
 void TextEditorManager::saveToFile(const string& filePath){
     string text= textEditor->getText();
     ofstream file(filePath,ios::out);

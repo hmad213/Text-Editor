@@ -111,6 +111,7 @@ TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent
     , cursorVisible(true)
     , selecting(false)
     , font("Consolas", 14)
+    , autocompleteFont("Segoe UI", 10)
 {
     setFocusPolicy(Qt::StrongFocus);
     font.setStyleHint(QFont::TypeWriter);
@@ -118,6 +119,7 @@ TextDisplayWidget::TextDisplayWidget(TextEditorManager* manager, QWidget *parent
 
     autocompletePopup = new QListWidget(this);
     autocompletePopup->setWindowFlags(Qt::ToolTip);
+    autocompletePopup->setFont(autocompleteFont);
     connect(autocompletePopup, &QListWidget::itemClicked, this, &TextDisplayWidget::clickAutocompletePopup);
 
     setMouseTracking(true);
@@ -263,12 +265,12 @@ void TextDisplayWidget::clickAutocompletePopup(QListWidgetItem* item)
 {
     QString word = item->text();
     autocompletePopup->hide();
+    editorManager->autocompleteText(word.toStdString());
 }
 
 void TextDisplayWidget::showAutocomplete(){
     DynamicArray<string> suggestions = editorManager->getAutocompleteSuggestions();
     if(suggestions.size() == 0){
-        cout << "hey" << endl;
         autocompletePopup->hide();
         return;
     }
@@ -289,6 +291,22 @@ void TextDisplayWidget::showAutocomplete(){
     autocompletePopup->move(mapToGlobal(pos));
 
     autocompletePopup->show();
+    resizeAutocompletePopup(suggestions.size());
+}
+
+void TextDisplayWidget::updateAutocomplete(){
+    if(!autocompletePopup->isVisible()) return;
+        
+    showAutocomplete();
+}
+
+void TextDisplayWidget::resizeAutocompletePopup(int count){
+    const int rowHeight = autocompletePopup->sizeHintForRow(0);
+    const int width = 100;
+
+    int height = rowHeight * count + 5;
+
+    autocompletePopup->setFixedSize(width, height);
 }
 
 void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
@@ -320,9 +338,11 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
         case Qt::Key_Backspace:
             editorManager->deleteChar();
+            updateAutocomplete();
             break;
         case Qt::Key_Left:
             editorManager->moveCursor(-1, 0);
+            updateAutocomplete();
             break;
         case Qt::Key_Up:
             editorManager->moveCursor(0, -1);
@@ -332,6 +352,7 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_Right:
             editorManager->moveCursor(1, 0);
+            updateAutocomplete();
             break;
         case Qt::Key_Return:
             editorManager->insertChar('\n');
