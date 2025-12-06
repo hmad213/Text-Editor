@@ -44,7 +44,7 @@ class Trie{
             TrieNode* cur = root;
 
             for(int i = 0; i < prefix.size(); i++){
-                char letter = prefix[i];
+                char letter = tolower(prefix[i]);
                 if(cur->nodes[letter - 'a'] == nullptr) return words;
                 cur = cur->nodes[letter - 'a'];
             }
