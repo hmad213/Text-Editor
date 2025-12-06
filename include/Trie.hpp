@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "Queue.hpp"
 #include "DynamicArray.hpp"
 using namespace std;
@@ -43,6 +44,13 @@ class Trie{
             DynamicArray<string> words;
             TrieNode* cur = root;
 
+            bool isUpper = true;
+            for(char c : prefix){
+                if(c < 'A' || c > 'Z'){
+                    isUpper = false;
+                }
+            }
+
             for(int i = 0; i < prefix.size(); i++){
                 char letter = tolower(prefix[i]);
                 if(cur->nodes[letter - 'a'] == nullptr) return words;
@@ -56,6 +64,10 @@ class Trie{
                 pair<TrieNode*, string> temp = q.peek();
                 q.dequeue();
                 if(temp.first->isWord){
+                    if(prefix.size() >= 2){
+                        if(isUpper) transform(temp.second.begin(), temp.second.end(), temp.second.begin(), 
+                                                [](unsigned char c){ return std::toupper(c); });
+                    }
                     words.push_back(temp.second);
                     i++;
                 }
