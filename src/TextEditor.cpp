@@ -7,6 +7,7 @@ TextEditor::TextEditor(){
     DoublyLinkedList<char>* newList = new DoublyLinkedList<char>;
     text.insertAtHead(newList);
     currentLineNode = text.getHead();
+    autocomplete = new Autocomplete;
 }
 
 TextEditor::~TextEditor(){
@@ -19,6 +20,8 @@ TextEditor::~TextEditor(){
         }
         currentLine = currentLine->next;
     }
+
+    delete autocomplete;
 }
 
 void TextEditor::initialize(){
@@ -427,7 +430,22 @@ Selection TextEditor::getSelectionDetails(){
 }
 
 bool TextEditor::hasSelection(){
-    return (selection.isSelecting && !(selection.startLine == selection.endLine & selection.startNode == selection.endNode));
+    return (selection.isSelecting && !(selection.startLine == selection.endLine && selection.startNode == selection.endNode));
+}
+
+DynamicArray<string> TextEditor::getAutocompleteSuggestions(){
+    string prefix = getPrefix();
+    if(prefix != "")
+        return autocomplete->findClosestWords(getPrefix(), 5);
+    DynamicArray<string> temp;
+    return temp;
+}
+
+void TextEditor::autocompleteText(string word){
+    string prefix = getPrefix();
+    for(int i = prefix.size(); i < word.size(); i++){
+        insertChar(word[i]);
+    }
 }
 
 int TextEditor::getLineIndex(){
@@ -436,4 +454,19 @@ int TextEditor::getLineIndex(){
 
 int TextEditor::getNodeIndex(){
     return nodeIndex;
+}
+
+string TextEditor::getPrefix(){
+    string temp = "";
+    char cur = 'a';
+    Node<char>* tempNode = currentNode;
+    while(tempNode != nullptr && cur != ' '){
+        cur = tempNode->value;
+        if(cur != ' '){
+            temp += tempNode->value;
+            tempNode = tempNode->prev;
+        }
+    }
+    reverse(temp.begin(), temp.end());
+    return temp;
 }

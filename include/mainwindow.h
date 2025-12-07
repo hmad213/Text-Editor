@@ -12,7 +12,10 @@
 #include <QFontMetrics>
 #include <QDir>
 #include <QFileDialog>
+#include <QListWidget>
+
 #include "ui_texteditor.h"
+#include "DynamicArray.hpp"
 #include "TextEditorManager.h"
 
 using namespace std;
@@ -61,12 +64,14 @@ class TextDisplayWidget : public QWidget
 
     private:
         TextEditorManager* editorManager;
+        QListWidget* autocompletePopup;
         QString text;
         int cursorLine;
         int cursorColumn;
         bool cursorVisible;
         QTimer cursorTimer;
         QFont font;
+        QFont autocompleteFont;
         bool selecting;
         QPoint selectionStart;
         QPoint selectionEnd;
@@ -83,6 +88,10 @@ class TextDisplayWidget : public QWidget
         void setCursorPosition(int line, int column);
         void getCursorPosition(int &line, int &column) const;
 
+        void showAutocomplete();
+        void updateAutocomplete();
+        void resizeAutocompletePopup(int count);
+
     protected:
         void paintEvent(QPaintEvent *event) override;
         void keyPressEvent(QKeyEvent *event) override;
@@ -92,4 +101,5 @@ class TextDisplayWidget : public QWidget
 
     private slots:
         void blinkCursor();
+        void clickAutocompletePopup(QListWidgetItem* item);
 };

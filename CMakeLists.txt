@@ -35,3 +35,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 # Link Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+
+configure_file(${CMAKE_SOURCE_DIR}/dictionary.txt
+               ${CMAKE_BINARY_DIR}/dictionary.txt
+               COPYONLY)

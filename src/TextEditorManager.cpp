@@ -97,6 +97,10 @@ bool TextEditorManager::hasSelection(){
     return textEditor->hasSelection();
 }
 
+DynamicArray<string> TextEditorManager::getAutocompleteSuggestions(){
+    return textEditor->getAutocompleteSuggestions();
+}
+
 void TextEditorManager::copyToClipboard() {
     if (textEditor->getSelectionDetails().isSelecting) {
         string selectedText = textEditor->getSelectedText();
@@ -124,6 +128,11 @@ void TextEditorManager::pasteFromClipboard() {
         textEditor->insertString(clipboardText.toStdString());
         updateDisplay();
     }
+}
+
+void TextEditorManager::autocompleteText(string word){
+    textEditor->autocompleteText(word);
+    updateDisplay();
 }
 
 void TextEditorManager::saveToFile(const string& filePath){
