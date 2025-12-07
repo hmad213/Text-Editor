@@ -2,27 +2,20 @@
 #include <iostream>
 using namespace std;
 
-struct Operation{
-    char letter;
-    int nodepos;
-    int linepos;
-    Operation(){};
-    Operation(char a, int b, int c):letter(a),nodepos(b),linepos(c){}
-};
 template <typename T>
-struct Nodes{
+struct StackNode{
     T value;
-    Nodes* next;
-    Nodes(){
+    StackNode* next;
+    StackNode(){
         next=nullptr;
     };
-    Nodes(T value, Nodes* next = nullptr) : value(value), next(next) {}
+    StackNode(T value, StackNode* next = nullptr) : value(value), next(next) {}
 };
 
 template <typename T>
 class Stack {
     private:
-        Nodes<T>* top;
+        StackNode<T>* top;
         int size;
     public:
         Stack(){
@@ -31,30 +24,30 @@ class Stack {
         }
 
         ~Stack(){
-            Nodes<T>* cur = top;
+            StackNode<T>* cur = top;
             while(cur != nullptr){
-                Nodes<T>* temp = cur;
+                StackNode<T>* temp = cur;
                 cur = cur->next;
                 delete temp;
             }
         }  
         
         void push(T value){
-            Nodes<T>* newNode = new Nodes<T>(value, top);
+            StackNode<T>* newNode = new StackNode<T>(value, top);
             top = newNode;
             size++;
         }
 
-        Nodes<T>* pop(){
+        T pop(){
             if(isEmpty()){
-                return new Nodes<T>();
+                throw invalid_argument("Stack is empty");
             }
-            Nodes<T>* temp = top;
+            StackNode<T>* temp = top;
             T value = top->value;
             top = top->next;
-            //delete temp;
+            delete temp;
             size--;
-            return temp;
+            return value;
         }
 
         T peek(){
