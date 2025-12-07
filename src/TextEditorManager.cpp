@@ -18,7 +18,7 @@ void TextEditorManager::initializeEditor(){
     updateDisplay();
 }
 
-void TextEditorManager::insertChar(char c) {
+void TextEditorManager::insertChar(char c) {  
     if(textEditor->hasSelection()){
         textEditor->deleteSelection();
     }
@@ -27,11 +27,16 @@ void TextEditorManager::insertChar(char c) {
     else
         textEditor->insertChar(c);
     updateDisplay();
+    string temp = "";
+    temp.push_back(c);
+    textEditor->pushInsertOperation(temp);
 }
+
 void TextEditorManager::undoOperation(){
-    textEditor->undooperation();
+    textEditor->undoOperation();
     updateDisplay();
 }
+
 void TextEditorManager::deleteChar() {
     if(textEditor->hasSelection()){
         textEditor->deleteSelection();
@@ -125,7 +130,9 @@ void TextEditorManager::pasteFromClipboard() {
             textEditor->deleteSelection();
         }
         
-        textEditor->insertString(clipboardText.toStdString());
+        string temp = clipboardText.toStdString();
+        textEditor->insertString(temp);
+        textEditor->pushInsertOperation(temp);
         updateDisplay();
     }
 }

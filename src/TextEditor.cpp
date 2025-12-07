@@ -37,91 +37,54 @@ void TextEditor::initialize(){
     currentLineNode = text.getHead();
 }
 
-void TextEditor:: unchardel(Node<char>* ptr){
-            Operation temp(ptr->value, nodeIndex, lineIndex);
-            undo.push(temp);
+void TextEditor::pushDeleteOperation(string val){
+    Operation* temp = new Operation('d', val, nodeIndex, lineIndex);
+    undo.push(temp);
+}
+
+void TextEditor::pushInsertOperation(string val){
+    Operation* temp = new Operation('i', val, nodeIndex, lineIndex);
+    undo.push(temp);
+}
+
+void TextEditor::undoOperation(){
+    if(undo.isEmpty()) return;
+
+    Operation* data = undo.pop();
+    int tempLineIndex = lineIndex;
+    int tempNodeIndex = nodeIndex;
+
+    setCursorPosition(data->linepos, data->nodepos);
+
+    bool isIndexGreater = false;
+    if(lineIndex > tempLineIndex || (lineIndex == tempLineIndex && nodeIndex + 1 >= tempNodeIndex)) isIndexGreater = true;
+    cout << lineIndex << " " << tempLineIndex << " " << nodeIndex << " " << tempNodeIndex << endl;
+
+    if(data->operation == 'i'){
+        for(int i = 0; i < data->str.size(); i++){
+            removeChar();
+            if(!isIndexGreater){
+                if(data->str[i] == '\n'){
+                    tempLineIndex--;
+                }else{
+                    tempNodeIndex--;
+                }
+            }
         }
+    }
+
+    setCursorPosition(tempLineIndex, tempNodeIndex);
+
+    cout << lineIndex << " " << nodeIndex << endl;
+        
+    delete data;
+}
+
 void TextEditor::overwriteText(string value){
     initialize();
     insertString(value);
 }
-void TextEditor::undooperation(){
-        if(!undo.isEmpty()){
-            Nodes<Operation>* data = undo.pop();
-            Node<DoublyLinkedList<char>*>* line = text.getHead();
-            Node<char>* character;
-            int linecount=0;
-            int charpos=1;
-            while(linecount<data->value.linepos&&line!=text.getTail()){
-                linecount++;
-                line= line->next;
-            }
-                if(line==text.getTail()&&linecount<data->value.linepos){
-                    while(linecount+1<data->value.linepos){
-                        DoublyLinkedList<char>* line=new DoublyLinkedList<char>();
-                        text.insertAtTail(line);
-                        linecount++;
-                    }
-                    char temp2=data->value.letter;
-                    DoublyLinkedList<char>* Lastline=new DoublyLinkedList<char>();
-                    text.insertAtTail(Lastline);
-                    if(charpos==data->value.nodepos){
-                    Lastline->insertAtHead(temp2);}
-                    else{
-                        character=line->value->head;
-                        character=new Node<char>(' ',nullptr,nullptr);
-                        while(charpos+1<data->value.nodepos){
-                        character->next=new Node<char>(' ',nullptr,character);
-                        charpos++;
-                        character=character->next;
-                    }
-                        character->next=new Node<char>(data->value.letter,nullptr,character);
-                        character=character->next;
-                        line->value->tail=character;
-                    }
-                }
-                else{
-                    character=line->value->head;
-                    if(charpos==data->value.nodepos){
-                        Node<char>* temp=new Node<char>(data->value.letter,character,nullptr);
-                        character->prev=temp;
-                        line->value->head=temp;
-                    }
-                    else{
-                    while(charpos+1<data->value.nodepos&&character!=line->value->tail){
-                    charpos++;
-                    character=character->next;
-                    }
-                    // if(character->prev==nullptr){
-                    //     Node<char>* temp=new Node<char>(data->value,character,nullptr);
-                    //     character->next->prev=temp;
-                    //     line->value->head=temp;
-                    // }
-                       if(character==line->value->tail&&charpos<data->value.nodepos){
-                            // while(charpos-1<data->nodepos){
-                            //     character->next=new Node<char>(' ',nullptr,character);
-                            //     charpos++;
-                            //     character=character->next;
-                            // }
-                            character->next=new Node<char>(data->value.letter,nullptr,character);
-                            character=character->next;
-                            line->value->tail=character;
-                            }
-                        else if(character->next==nullptr){
-                            character->next=new Node<char>(data->value.letter,nullptr,character);
-                            line->value->tail=character->next;
-                        }
-                        else {
-                            Node<char>* temp=character->next;
-                            character->next=new Node<char>(data->value.letter,temp,character);
-                            character=character->next;
-                            character->next->prev=character; 
-                            }
-                        
-                    }}
-            delete data;
-        }
-        };
+
 void TextEditor::insertString(string value) {
     for (int i = 0; i < value.size(); i++) {
         if (value[i] == '\n') {
@@ -147,8 +110,6 @@ void TextEditor::removeChar(){
     }
 
     // uses removeFromNode in DoublyLinkedList
-    unchardel(currentNode);
-    // undo.push(currentNode->value,nodeIndex,lineIndex);
     currentNode = currentLineNode->value->removeFromNode(currentNode);
     nodeIndex--;
 }
@@ -164,7 +125,6 @@ void TextEditor::removeCharFront(){
         }
         if(currentLineNode->value->getHead())
             currentLineNode->value->removeFromHead();
-        cout << getText();
         return;                    
     }
     if(!currentNode->next && currentLineNode->next){
@@ -177,7 +137,6 @@ void TextEditor::removeCharFront(){
     // uses removeFromNode in DoublyLinkedList
     if(currentNode->next)
         currentNode = currentLineNode->value->removeFromNode(currentNode->next);
-    cout << getText();
 }
 
 void TextEditor::addNewLine(){

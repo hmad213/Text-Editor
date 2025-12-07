@@ -18,6 +18,15 @@ struct Selection{
     Selection() : isSelecting(false), startLine(0), startNode(0), endLine(0), endNode(0){}
 };
 
+struct Operation{
+    char operation;
+    string str;
+    int nodepos;
+    int linepos;
+    Operation(){};
+    Operation(char o, string s, int x, int y) : operation(o), str(s), nodepos(x), linepos(y){}
+};
+
 class TextEditor{
     private:
         DoublyLinkedList<DoublyLinkedList<char>*> text;
@@ -30,14 +39,15 @@ class TextEditor{
         Autocomplete* autocomplete;
 
         Selection selection;
-        Stack<Operation> undo;
+        Stack<Operation*> undo;
     public:
         TextEditor();
         ~TextEditor();
         void initialize();
-        //my functions
-        void unchardel(Node<char>* ptr);
-        void undooperation();
+        
+        void pushDeleteOperation(string val);
+        void pushInsertOperation(string val);
+        void undoOperation();
 
         void overwriteText(string value);
 

@@ -275,11 +275,6 @@ void TextDisplayWidget::showAutocomplete(){
         return;
     }
 
-    for(int i = 0; i < suggestions.size(); i++){
-        cout << suggestions[i] << " ";
-    }
-    cout << endl;
-
     autocompletePopup->clear();
 
     for(int i = 0; i < suggestions.size(); i++){
