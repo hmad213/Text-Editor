@@ -28,7 +28,10 @@ void TextEditorManager::insertChar(char c) {
         textEditor->insertChar(c);
     updateDisplay();
 }
-
+void TextEditorManager::undoOperation(){
+    textEditor->undooperation();
+    updateDisplay();
+}
 void TextEditorManager::deleteChar() {
     if(textEditor->hasSelection()){
         textEditor->deleteSelection();

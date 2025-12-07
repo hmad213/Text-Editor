@@ -39,7 +39,7 @@ class TextEditorManager{
         void copyToClipboard();
         void cutToClipboard();
         void pasteFromClipboard();
-
+        void undoOperation();
         void updateDisplay();
         void run();
 };

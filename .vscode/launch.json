@@ -10,7 +10,8 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "CMake Build",
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "visualizerFile": "c:\\Users\\Aliyan\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8207a40f4566b86ad5602ba334fd4c20\\tonka3000.qtvsctools\\qt.natvis.xml"
         }
     ]
 }

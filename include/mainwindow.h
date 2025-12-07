@@ -12,7 +12,6 @@
 #include <QFontMetrics>
 #include <QDir>
 #include <QFileDialog>
-
 #include "ui_texteditor.h"
 #include "TextEditorManager.h"
 

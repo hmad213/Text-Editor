@@ -6,5 +6,6 @@ int main(int argc, char *argv[]){
     TextEditorManager manager;
     manager.run();
     
+    
     return app.exec();  // Start the event loop
 }

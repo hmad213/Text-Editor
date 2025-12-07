@@ -10,13 +10,13 @@ struct Node{
 
     Node(T value, Node* next = nullptr, Node* prev = nullptr) : value(value), next(next), prev(prev) {}
 };
-
+class TextEditor;
 template <typename T>
 class DoublyLinkedList{
-    private:
+    public:
         Node<T>* head;
         Node<T>* tail;
-    public:
+        //friend DoublyLinkedList<DoublyLinkedList<char>*> TextEditor::ConvertToLinkedList(const string& input);
         DoublyLinkedList(){
             head = nullptr;
             tail = nullptr;
@@ -242,10 +242,12 @@ class DoublyLinkedList{
                 removeFromHead();
                 return nullptr;
             }
-
-            Node<T>* temp = node->prev;
+            Node<T>* temp;
+            if(node->prev!=nullptr&&node->next!=nullptr){
+            temp = node->prev;
             node->prev->next = node->next;
             node->next->prev = node->prev;
+            }
             delete node;
             return temp;
         }

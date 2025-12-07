@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include "Stack.hpp"
 #include "DoublyLinkedList.hpp"
 using namespace std;
 
@@ -22,10 +24,14 @@ class TextEditor{
         int nodeIndex;
         int lineIndex;
         Selection selection;
+        Stack<Operation> undo;
     public:
         TextEditor();
         ~TextEditor();
         void initialize();
+        //my functions
+        void unchardel(Node<char>* ptr);
+        void undooperation();
 
         void overwriteText(string value);
 
@@ -51,6 +57,7 @@ class TextEditor{
         bool hasSelection();
 
         string getText();
+        
         int getLineIndex();
         int getNodeIndex();
 };

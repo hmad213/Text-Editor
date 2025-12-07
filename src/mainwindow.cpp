@@ -278,6 +278,9 @@ void TextDisplayWidget::keyPressEvent(QKeyEvent *event)
             case Qt::Key_X:
                 editorManager->cutToClipboard();
                 return;
+            case Qt::Key_Z:
+            editorManager->undoOperation();
+            return;
         }
     }
 
