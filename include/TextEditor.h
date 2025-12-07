@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include "DynamicArray.hpp"
+#include "Stack.hpp"
 #include "DoublyLinkedList.hpp"
 #include "Autocomplete.h"
 using namespace std;
@@ -29,10 +30,14 @@ class TextEditor{
         Autocomplete* autocomplete;
 
         Selection selection;
+        Stack<Operation> undo;
     public:
         TextEditor();
         ~TextEditor();
         void initialize();
+        //my functions
+        void unchardel(Node<char>* ptr);
+        void undooperation();
 
         void overwriteText(string value);
 
@@ -61,6 +66,7 @@ class TextEditor{
         void autocompleteText(string word);
 
         string getText();
+        
         int getLineIndex();
         int getNodeIndex();
         string getPrefix();

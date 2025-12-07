@@ -37,11 +37,91 @@ void TextEditor::initialize(){
     currentLineNode = text.getHead();
 }
 
+void TextEditor:: unchardel(Node<char>* ptr){
+            Operation temp(ptr->value, nodeIndex, lineIndex);
+            undo.push(temp);
+        }
 void TextEditor::overwriteText(string value){
     initialize();
     insertString(value);
 }
-
+void TextEditor::undooperation(){
+        if(!undo.isEmpty()){
+            Nodes<Operation>* data = undo.pop();
+            Node<DoublyLinkedList<char>*>* line = text.getHead();
+            Node<char>* character;
+            int linecount=0;
+            int charpos=1;
+            while(linecount<data->value.linepos&&line!=text.getTail()){
+                linecount++;
+                line= line->next;
+            }
+                if(line==text.getTail()&&linecount<data->value.linepos){
+                    while(linecount+1<data->value.linepos){
+                        DoublyLinkedList<char>* line=new DoublyLinkedList<char>();
+                        text.insertAtTail(line);
+                        linecount++;
+                    }
+                    char temp2=data->value.letter;
+                    DoublyLinkedList<char>* Lastline=new DoublyLinkedList<char>();
+                    text.insertAtTail(Lastline);
+                    if(charpos==data->value.nodepos){
+                    Lastline->insertAtHead(temp2);}
+                    else{
+                        character=line->value->head;
+                        character=new Node<char>(' ',nullptr,nullptr);
+                        while(charpos+1<data->value.nodepos){
+                        character->next=new Node<char>(' ',nullptr,character);
+                        charpos++;
+                        character=character->next;
+                    }
+                        character->next=new Node<char>(data->value.letter,nullptr,character);
+                        character=character->next;
+                        line->value->tail=character;
+                    }
+                }
+                else{
+                    character=line->value->head;
+                    if(charpos==data->value.nodepos){
+                        Node<char>* temp=new Node<char>(data->value.letter,character,nullptr);
+                        character->prev=temp;
+                        line->value->head=temp;
+                    }
+                    else{
+                    while(charpos+1<data->value.nodepos&&character!=line->value->tail){
+                    charpos++;
+                    character=character->next;
+                    }
+                    // if(character->prev==nullptr){
+                    //     Node<char>* temp=new Node<char>(data->value,character,nullptr);
+                    //     character->next->prev=temp;
+                    //     line->value->head=temp;
+                    // }
+                       if(character==line->value->tail&&charpos<data->value.nodepos){
+                            // while(charpos-1<data->nodepos){
+                            //     character->next=new Node<char>(' ',nullptr,character);
+                            //     charpos++;
+                            //     character=character->next;
+                            // }
+                            character->next=new Node<char>(data->value.letter,nullptr,character);
+                            character=character->next;
+                            line->value->tail=character;
+                            }
+                        else if(character->next==nullptr){
+                            character->next=new Node<char>(data->value.letter,nullptr,character);
+                            line->value->tail=character->next;
+                        }
+                        else {
+                            Node<char>* temp=character->next;
+                            character->next=new Node<char>(data->value.letter,temp,character);
+                            character=character->next;
+                            character->next->prev=character; 
+                            }
+                        
+                    }}
+            delete data;
+        }
+        };
 void TextEditor::insertString(string value) {
     for (int i = 0; i < value.size(); i++) {
         if (value[i] == '\n') {
@@ -61,11 +141,14 @@ void TextEditor::insertChar(char value){
 void TextEditor::removeChar(){
     // Special case: if cursor is at the start of line, remove the line
     if(!currentNode){
+       //undo.push(currentNode->value,nodeIndex,lineIndex); 
         removeLine();
         return;
     }
 
     // uses removeFromNode in DoublyLinkedList
+    unchardel(currentNode);
+    // undo.push(currentNode->value,nodeIndex,lineIndex);
     currentNode = currentLineNode->value->removeFromNode(currentNode);
     nodeIndex--;
 }
@@ -122,7 +205,7 @@ void TextEditor::removeLine(){
     // merging of current line with previous one to form a singular line
 
     Node<DoublyLinkedList<char>*>* prevLine = currentLineNode->prev;
-
+    //undo.push(currentLineNode->value->head->value,1,lineIndex-1);///pending (merginging of  line undo and seperation of line undo)
     currentNode = prevLine->value->getTail();
     nodeIndex = prevLine->value->getSize();
 
