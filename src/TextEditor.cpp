@@ -71,6 +71,17 @@ void TextEditor::undoOperation(){
                 }
             }
         }
+    }else if(data->operation == 'd'){
+        for(int i = 0; i < data->str.size(); i++){
+            insertChar(data->str[i]);
+            if(!isIndexGreater){
+                if(data->str[i] == '\n'){
+                    tempLineIndex++;
+                }else{
+                    tempNodeIndex++;
+                }
+            }
+        }
     }
 
     setCursorPosition(tempLineIndex, tempNodeIndex);
@@ -402,9 +413,12 @@ DynamicArray<string> TextEditor::getAutocompleteSuggestions(){
 
 void TextEditor::autocompleteText(string word){
     string prefix = getPrefix();
+    string suffix = "";
     for(int i = prefix.size(); i < word.size(); i++){
         insertChar(word[i]);
+        suffix += word[i];
     }
+    pushInsertOperation(suffix);
 }
 
 int TextEditor::getLineIndex(){
@@ -413,6 +427,17 @@ int TextEditor::getLineIndex(){
 
 int TextEditor::getNodeIndex(){
     return nodeIndex;
+}
+
+char TextEditor::getCurrentChar(){
+    return currentNode ? currentNode->value : '\n';
+}
+
+char TextEditor::getNextChar(){
+    if(currentNode){
+        return currentNode->next ? currentNode->next->value : '\n';
+    }
+    return ' ';
 }
 
 string TextEditor::getPrefix(){

@@ -80,4 +80,6 @@ class TextEditor{
         int getLineIndex();
         int getNodeIndex();
         string getPrefix();
+        char getCurrentChar();
+        char getNextChar();
 };

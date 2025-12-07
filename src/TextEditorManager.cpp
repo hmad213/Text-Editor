@@ -39,18 +39,28 @@ void TextEditorManager::undoOperation(){
 
 void TextEditorManager::deleteChar() {
     if(textEditor->hasSelection()){
+        string text = getSelectedText();
         textEditor->deleteSelection();
+        textEditor->pushDeleteOperation(text);
     }else{
+        string text = "";
+        text += textEditor->getCurrentChar();
         textEditor->removeChar();
+        textEditor->pushDeleteOperation(text);
     }
     updateDisplay();
 }
 
 void TextEditorManager::deleteCharFront(){
     if(textEditor->hasSelection()){
+        string text = getSelectedText();
         textEditor->deleteSelection();
+        textEditor->pushDeleteOperation(text);
     }else{
+        string text = "";
+        text += textEditor->getNextChar();
         textEditor->removeCharFront();
+        textEditor->pushDeleteOperation(text);
     }
     updateDisplay();
 }
